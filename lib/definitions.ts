@@ -1,4 +1,4 @@
-
+//型の定義をしています
 export type User = {
     id: string;
     name: string;

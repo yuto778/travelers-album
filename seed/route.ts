@@ -32,7 +32,7 @@ async function seedUsers() {
     return insertedUsers;
 }
 
-//fellow_travelersの定義
+//fellow_travelersテーブルの定義
 async function seedFellow_travelers() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS fellow_travelers (
@@ -57,7 +57,7 @@ async function seedFellow_travelers() {
     return insertedFellow_travelers;
 }
 
-//seedTripboards_Usersの定義
+//seedTripboards_Usersテーブルの定義
 async function seedTripboards_Users() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS tripboards_users (
@@ -82,7 +82,7 @@ async function seedTripboards_Users() {
     return insertedTripboards_Users;
 }
 
-//seedTrip_boardsの定義
+//seedTrip_boardsテーブルの定義
 async function seedTrip_boards() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS trip_boards (
@@ -91,7 +91,7 @@ async function seedTrip_boards() {
         startday DATE NOT NULL,
         endday DATE, 
         thumbnail TEXT NOT NULL,
-        owner_id CHAR(3),
+        owner_id TEXT NOT NULL,
         last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `;
@@ -115,7 +115,7 @@ async function seedTrip_boards() {
     return insertedTrip_boards;
 }
 
-//seedTrip_cardsの定義
+//seedTrip_cardsテーブルの定義
 async function seedTrip_cards() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS trip_cards (
@@ -123,8 +123,7 @@ async function seedTrip_cards() {
         board_id TEXT NOT NULL,
         memo TEXT,
         thumbnail_id SERIAL,
-        location_pointx,
-        location_pointy,
+        location_point POINT,
         FOREIGN KEY (board_id) REFERENCES trip_boards(id)
       );
     `;
@@ -132,13 +131,12 @@ async function seedTrip_cards() {
     const insertedTrip_cards = await Promise.all(
         trip_cards.map(
         (trip_cards) => client.sql`
-          INSERT INTO trip_cards (id, board_id, memo, thumbnail_id, location_pointx, location_pointy)
+          INSERT INTO trip_cards (id, board_id, memo, thumbnail_id, location_point)
           VALUES (${trip_cards.id},
                   ${trip_cards.board_id},
                   ${trip_cards.memo},
                   ${trip_cards.thumbnail_id},
-                  ${trip_cards.location_pointx},
-                  ${trip_cards.location_pointy}
+                  ${trip_cards.location_point}
                  )
           ON CONFLICT (id) DO NOTHING;
         `,
@@ -148,7 +146,7 @@ async function seedTrip_cards() {
     return insertedTrip_cards;
 }
 
-//seedCard_picturesの定義
+//seedCard_picturesテーブルの定義
 async function seedCard_pictures() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS card_pictures (
