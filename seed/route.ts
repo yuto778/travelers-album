@@ -1,9 +1,11 @@
+//このファイルでは各テーブルの定義をして別のファイルで使えるようにしています
 import bcrypt from 'bcrypt';
 import { db } from '@vercel/postgres';
 import { users, fellow_travelers, tripboards_users, trip_boards, trip_cards, card_pictures} from '../lib/placeholder-data';
 
 const client = await db.connect();
 
+//Usersテーブルの定義
 async function seedUsers() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS users (
@@ -30,6 +32,7 @@ async function seedUsers() {
     return insertedUsers;
 }
 
+//fellow_travelersの定義
 async function seedFellow_travelers() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS fellow_travelers (
@@ -54,6 +57,7 @@ async function seedFellow_travelers() {
     return insertedFellow_travelers;
 }
 
+//seedTripboards_Usersの定義
 async function seedTripboards_Users() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS tripboards_users (
@@ -78,6 +82,7 @@ async function seedTripboards_Users() {
     return insertedTripboards_Users;
 }
 
+//seedTrip_boardsの定義
 async function seedTrip_boards() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS trip_boards (
@@ -110,6 +115,7 @@ async function seedTrip_boards() {
     return insertedTrip_boards;
 }
 
+//seedTrip_cardsの定義
 async function seedTrip_cards() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS trip_cards (
@@ -142,6 +148,7 @@ async function seedTrip_cards() {
     return insertedTrip_cards;
 }
 
+//seedCard_picturesの定義
 async function seedCard_pictures() {
     await client.sql`
       CREATE TABLE IF NOT EXISTS card_pictures (
@@ -164,4 +171,23 @@ async function seedCard_pictures() {
     );
   
     return insertedCard_pictures;
+}
+
+//データベースにシードするスクリプト
+export async function GET() {
+  try {
+      await client.sql`BEGIN`;
+      await seedUsers();
+      await seedFellow_travelers();
+      await seedTripboards_Users();
+      await seedTrip_boards();
+      await seedTrip_cards();
+      await seedCard_pictures();
+      await client.sql`COMMIT`;
+
+      return Response.json({ message: 'Database seeded successfully' });
+  } catch (error) {
+      await client.sql`ROLLBACK`;
+      return Response.json({ error }, { status: 500 });
+  }
 }
