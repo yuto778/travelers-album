@@ -17,10 +17,10 @@ const page = () => {
     <>
       {/* トースターの表示（1秒表示) */}
       <Toaster toastOptions={{ duration: 1000 }} />
-      <div className="h-screen w-full flex flex-col bg-gradient-to-b from-white to-black">
+      <div className="h-screen w-full flex flex-col bg-gradient-to-b from-neutral-100 to-green-700">
         {/* /components/Header.tsx */}
-        <Header className="bg-neutral-300" />
-        <div className="flex-1  flex items-center justify-center bg-gradient-to-b from-green-300 to-green-200">
+        <Header className="" />
+        <div className="flex-1  flex items-center justify-center ">
           {/* /components/Form.tsx */}
           <Form />
         </div>

@@ -103,7 +103,7 @@ const Form = () => {
 
   return (
     <>
-      <div className="bg-yellow-400 bg-opacity-20 rounded-lg shadow-lg  w-full mx-14 md:w-1/2 py-4 px-12 space-y-3">
+      <div className="bg-green-400 bg-opacity-25 rounded-lg shadow-lg  w-full mx-14 md:w-1/2 py-4 px-12 space-y-3">
         {variant === "LogIn" && (
           <>
             <h2 className="text-center text-2xl font-bold">ログイン</h2>
@@ -134,7 +134,7 @@ const Form = () => {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="TripLove"
+                          placeholder="＊＊＊＊＊＊＊"
                           {...field}
                         />
                       </FormControl>
