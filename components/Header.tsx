@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -22,10 +22,23 @@ interface HeaderProps {
   className?: string;
 }
 
+type Variant = "notification" | "none";
+
 const Header: React.FC<HeaderProps> = ({ menu, className }) => {
+  const [variant, setVariant] = useState<Variant>("none");
   const router = useRouter();
   const handlelogout = () => {
     router.push("/login");
+  };
+
+  const toggleVariant = () => {
+    if (variant === "none") {
+      setVariant("notification");
+    }
+
+    if (variant === "notification") {
+      setVariant("none");
+    }
   };
 
   return (
@@ -45,6 +58,9 @@ const Header: React.FC<HeaderProps> = ({ menu, className }) => {
       {menu && (
         <>
           <div className="md:flex items-center space-x-5 hidden  px-5 ">
+            <div onClick={toggleVariant} className="cursor-pointer">
+              通知
+            </div>
             <div className="flex flex-col relative w-16  rounded-lg items-center space-y-1 hover:scale-105 transition py-1 border border-gray-200 shadow-md hover:shadow-none hover:border-green-300">
               <Home className="self-center " />
               <h2 className="text-xs ">ホーム</h2>
@@ -53,7 +69,9 @@ const Header: React.FC<HeaderProps> = ({ menu, className }) => {
             <div className="flex flex-col relative w-16  rounded-lg items-center space-y-1 hover:scale-105 transition py-1 border border-gray-200 shadow-md hover:shadow-none hover:border-green-300">
               <div className="relative ">
                 <BellIcon className="self-center " />
-                <span className="h-2 w-2 rounded-full bg-red-600 absolute top-0 right-0 "></span>
+                {variant === "notification" && (
+                  <span className="h-2 w-2 rounded-full bg-red-600 absolute top-0 right-0 "></span>
+                )}
               </div>
               <h2 className="text-xs ">通知</h2>
               <Link href={"/"} className="absolute inset-0"></Link>

@@ -35,9 +35,13 @@ const page = ({ params: { id } }: { params: { id: string } }) => {
                 <div
                   key={index}
                   className="bg-green-200
-                   p-16 rounded-2xl shadow-custom-shadow hover:scale-110 transition hover:shadow-none cursor-pointer"
+                   p-16 rounded-2xl shadow-custom-shadow hover:scale-110 transition hover:shadow-none cursor-pointer relative"
                 >
                   <h3 className="whitespace-nowrap">カード{index + 1}</h3>
+                  <Link
+                    href={`/trip/${id}/card/${index + 1}`}
+                    className="absolute inset-0"
+                  ></Link>
                 </div>
               ))}
             </div>
