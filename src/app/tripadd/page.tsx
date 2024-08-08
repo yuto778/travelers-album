@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 const page = () => {
   return (
     <>
-      <div className="h-screen w-full bg-gradient-to-b from-white to-black flex flex-col">
+      <div className="h-screen w-full  bg-gradient-to-b from-neutral-100 to-green-700 flex flex-col">
         <Header menu />
         <div className="flex-1 flex flex-col ">
           <div className=" flex-1">

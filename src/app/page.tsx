@@ -39,7 +39,7 @@ export default async function Home() {
                     <Link
                       key={index}
                       className="absolute inset-0 "
-                      href={`/trip/${index + 1}`}
+                      href={`/trip/${index + 1}/card`}
                     ></Link>
                   </div>
                 ))}
@@ -54,7 +54,7 @@ export default async function Home() {
           </div>
         </div>
         <div className="absolute bottom-5 right-3 md:right-5">
-          <div className="relative p-2 bg-slate-400 rounded-full  cursor-pointer hover:scale-125 transition ">
+          <div className="relative p-2 bg-slate-400 rounded-full  cursor-pointer hover:scale-125 transition shadow-custom-shadow ">
             <PlusCircle className="" />
             <Link href={"/tripadd"} className="absolute inset-0"></Link>
           </div>
