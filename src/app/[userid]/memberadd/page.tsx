@@ -14,12 +14,13 @@ export const metadata: Metadata = {
 
 const page = () => {
   return (
-    <div className="h-screen w-full flex flex-col">
+    <div className="h-screen w-full flex flex-col bg-gradient-to-b from-neutral-100 to-green-700">
       <Header menu />
-      <div className="flex-1  flex flex-col  px-10 md:px-28 py-10 bg-gradient-to-b from-green-300 to-green-200">
-        <h2 className="text-3xl">Add Member</h2>
-        <div className="flex-1 flex flex-col items-center   py-32 px-10 ">
-          <div className="flex items-center  w-auto md:w-2/3  ">
+      <div className="flex-1  flex flex-col  items-center py-10 ">
+        <div className="flex-1 flex flex-col  items-center justify-around w-1/2  py-32 px-10 bg-green-400 bg-opacity-25 shadow-custom-shadow rounded-xl ">
+          <h2 className="text-3xl">メンバーを追加</h2>
+
+          <div className="flex items-center   md:w-2/3  ">
             <label htmlFor="member" className="text-xl  whitespace-nowrap px-5">
               ID検索 :
             </label>
@@ -29,7 +30,7 @@ const page = () => {
               className="rounded-lg pr-5 shadow-custom-shadow cursor-pointer"
             />
           </div>
-          <span className="flex-1"></span>
+
           <Button
             variant="outline"
             className="bg-yellow-400 hover:bg-yellow-500 shadow-custom-shadow hover:shadow-none "
