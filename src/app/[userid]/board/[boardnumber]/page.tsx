@@ -32,7 +32,7 @@ const page = ({
           <div className="h-1/2  flex flex-col  rounded-3xl   relative shadow-custom-shadow ">
             <h2 className="self-center text-2xl font-bold pt-5 ">Cards</h2>
             <div
-              className="h-2/3 px-5 w-full rounded-3xl flex  gap-6 items-center overflow-x-scroll relative mx-5 border
+              className="h-2/3 px-5 w-full rounded-3xl flex  gap-6 items-center overflow-x-scroll relative mx-5 
           "
             >
               {[...Array(9)].map((_, index) => (
@@ -52,14 +52,21 @@ const page = ({
             <div className="absolute bottom-3 right-10 z-20">
               <div className="relative p-2 bg-slate-400 rounded-full  cursor-pointer hover:scale-125 transition ">
                 <PlusCircleIcon />
-                <Link href={"/"} className="inset-0 absolute"></Link>
+                <Link
+                  href={`/${userid}/board/${boardnumber}/cardadd`}
+                  className="inset-0 absolute"
+                ></Link>
               </div>
             </div>
           </div>
           <div className="flex-1 flex py-5">
             <div className="w-1/2 flex items-center justify-center">
-              <Button className="" size="lg">
+              <Button className="relative" size="lg">
                 <h2 className="text-2xl py-5 px-3">写真を表示</h2>
+                <Link
+                  href={`/${userid}/board/${boardnumber}/photo`}
+                  className="absolute inset-0"
+                ></Link>
               </Button>
             </div>
             <div className="flex-1 flex items-center justify-center bg-neutral-400 rounded-xl m-4"></div>

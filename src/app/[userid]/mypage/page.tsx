@@ -3,6 +3,7 @@ import Header from "../../../../components/Header";
 import { Input } from "../../../../components/ui/input";
 import { Metadata } from "next";
 import "../../../../styles/global.css";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "マイページ",
@@ -14,7 +15,8 @@ export const metadata: Metadata = {
 // params:{userid}でurlの[userid]を取得
 const page = ({ params: { userid } }: { params: { userid: string } }) => {
   const datafetch = async () => {
-    // データフェッチ(userid)
+    // データフェッチ
+    userid;
   };
   return (
     <div className="w-full h-screen flex flex-col  layer-gradient">
@@ -24,7 +26,14 @@ const page = ({ params: { userid } }: { params: { userid: string } }) => {
         <div className="bg-green-400 bg-opacity-25 px-20 py-10 w-1/2 rounded-2xl shadow-custom-shadow flex flex-col items-center space-y-5  ">
           <h2 className="text-2xl font-bold">マイページ</h2>
           <div className="flex w-2/3  justify-around items-center ">
-            <div className="bg-gray-400 size-20 rounded-full"></div>
+            <div className="bg-gray-400 size-20 rounded-full relative overflow-hidden">
+              <Image
+                src={"/images/routephoto.jpg"}
+                fill
+                className="object-cover"
+                alt="仮の写真です"
+              />
+            </div>
             <span className="underline text-xl">名前</span>
           </div>
           <div className="space-y-2 w-2/3">

@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
               <BookUserIcon className="self-center" />
               <h2 className="text-xs mx-2 ">登録者一覧</h2>
               <Link
-                href={`/${userid}/board`}
+                href={`/${userid}/register`}
                 className="absolute inset-0"
               ></Link>
             </div>
