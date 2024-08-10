@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
 import Header from "../../../../components/Header";
+import "../../../../styles/global.css";
 
 export const metadata: Metadata = {
   title: "ホーム",
@@ -21,7 +22,7 @@ export default async function Home({
     <>
       {/* トースターの使用 */}
       <Toaster />
-      <div className="flex flex-col h-screen w-full  relative bg-gradient-to-b from-neutral-100 to-green-700">
+      <div className="flex flex-col h-screen w-full  relative layer-gradient">
         {/* components/Header.tsx */}
         <Header menu />
         <div className="flex flex-col flex-1 overflow-hidden">

@@ -3,12 +3,16 @@
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
-import { id, ja } from "date-fns/locale";
+import { ja } from "date-fns/locale";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, PlusCircle, PlusCircleIcon, X } from "lucide-react";
+import { format } from "date-fns";
+import { CalendarIcon, PlusCircleIcon, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { cn } from "../@/lib/utils";
 import {
   FormControl,
   FormField,
@@ -17,13 +21,9 @@ import {
   FormMessage,
   Form as HookForm,
 } from "../components/ui/form";
-import { useRouter } from "next/navigation";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { cn } from "../@/lib/utils";
-import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
-import React, { useState } from "react";
 import { Checkbox } from "./ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 const TripAddSchema = z.object({
   Title: z.string(),
@@ -170,7 +170,7 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
                 name="DepartureDate"
                 render={({ field }) => (
                   <FormItem className="flex items-center w-full pr-16 space-y-0 relative">
-                    <FormLabel className="text-lg md:text-xl  w-1/3  sm:w-1/4 text-center">
+                    <FormLabel className="text-lg md:text-xl w-1/3  sm:w-1/4 text-center">
                       出発日 :
                     </FormLabel>
                     <Popover>
@@ -223,8 +223,8 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
                                       }}
                                     >
                                       {Array.from(
-                                        { length: 201 },
-                                        (_, i) => i + 1900
+                                        { length: 101 },
+                                        (_, i) => i + 1990
                                       ).map((year) => (
                                         <option key={year} value={year}>
                                           {year}年

@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../../../../components/Header";
 import { Input } from "../../../../components/ui/input";
 import { Metadata } from "next";
+import "../../../../styles/global.css";
 
 export const metadata: Metadata = {
   title: "マイページ",
@@ -16,7 +17,7 @@ const page = ({ params: { userid } }: { params: { userid: string } }) => {
     // データフェッチ(userid)
   };
   return (
-    <div className="w-full h-screen flex flex-col  bg-gradient-to-b from-neutral-100 to-green-700">
+    <div className="w-full h-screen flex flex-col  layer-gradient">
       {/* /components/Header.tsx */}
       <Header menu />
       <div className="flex items-center justify-center flex-1 ">

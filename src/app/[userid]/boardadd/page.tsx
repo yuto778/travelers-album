@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Header from "../../../../components/Header";
 import TripAddForm from "../../../../components/TripAddForm";
+import "../../../../styles/global.css";
 
 export const metadata: Metadata = {
   title: "旅行追加画面",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 const page = ({ params: { userid } }: { params: { userid: string } }) => {
   return (
     <>
-      <div className="h-screen w-full  bg-gradient-to-b from-neutral-100 to-green-700 flex flex-col">
+      <div className="h-screen w-full  layer-gradient flex flex-col">
         <Header menu />
         <div className="flex-1 flex flex-col ">
           <div className=" flex-1">

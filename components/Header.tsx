@@ -1,9 +1,5 @@
 "use client";
 
-import React, { useState } from "react";
-import { Button } from "./ui/button";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   BellIcon,
   BookUserIcon,
@@ -11,11 +7,12 @@ import {
   Home,
   LogOutIcon,
   Pen,
-  PersonStanding,
-  PersonStandingIcon,
 } from "lucide-react";
-import Hamburger from "./Hamburger";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { cn } from "../@/lib/utils";
+import Hamburger from "./Hamburger";
 
 interface HeaderProps {
   menu?: boolean;
@@ -28,6 +25,7 @@ type Variant = "notification" | "none";
 const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
   const [variant, setVariant] = useState<Variant>("none");
   const router = useRouter();
+
   const handlelogout = () => {
     router.push("/login");
   };
@@ -58,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
       <span className="flex-1"></span>
       {menu && (
         <>
-          <div className="md:flex items-center space-x-5 hidden  px-5 ">
+          <div className="md:flex items-center space-x-5 hidden px-5">
             <div onClick={toggleVariant} className="cursor-pointer">
               通知
             </div>
@@ -78,7 +76,10 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
                 )}
               </div>
               <h2 className="text-xs ">通知</h2>
-              <Link href={"/"} className="absolute inset-0"></Link>
+              <Link
+                href={`/${userid}/notification`}
+                className="absolute inset-0"
+              ></Link>
             </div>
             <div className="flex flex-col relative w-16 rounded-lg items-center space-y-1 hover:scale-105 transition py-1 border border-gray-200 shadow-md hover:shadow-none hover:border-green-300">
               <Pen className="self-center" />
