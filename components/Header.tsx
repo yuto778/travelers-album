@@ -20,11 +20,12 @@ import { cn } from "../@/lib/utils";
 interface HeaderProps {
   menu?: boolean;
   className?: string;
+  userid?: string;
 }
 
 type Variant = "notification" | "none";
 
-const Header: React.FC<HeaderProps> = ({ menu, className }) => {
+const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
   const [variant, setVariant] = useState<Variant>("none");
   const router = useRouter();
   const handlelogout = () => {
@@ -49,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ menu, className }) => {
       )}
     >
       <Link
-        href={"/"}
+        href={`/${userid}/board`}
         className="font-bold text-2xl md:text-2xl cursor-pointer"
       >
         Travelers Album
@@ -64,7 +65,10 @@ const Header: React.FC<HeaderProps> = ({ menu, className }) => {
             <div className="flex flex-col relative w-16  rounded-lg items-center space-y-1 hover:scale-105 transition py-1 border border-gray-200 shadow-md hover:shadow-none hover:border-green-300">
               <Home className="self-center " />
               <h2 className="text-xs ">ホーム</h2>
-              <Link href={"/"} className="absolute inset-0"></Link>
+              <Link
+                href={`/${userid}/board`}
+                className="absolute inset-0"
+              ></Link>
             </div>
             <div className="flex flex-col relative w-16  rounded-lg items-center space-y-1 hover:scale-105 transition py-1 border border-gray-200 shadow-md hover:shadow-none hover:border-green-300">
               <div className="relative ">
@@ -79,17 +83,26 @@ const Header: React.FC<HeaderProps> = ({ menu, className }) => {
             <div className="flex flex-col relative w-16 rounded-lg items-center space-y-1 hover:scale-105 transition py-1 border border-gray-200 shadow-md hover:shadow-none hover:border-green-300">
               <Pen className="self-center" />
               <h2 className="text-xs ">追加</h2>
-              <Link href={"/tripadd"} className="absolute inset-0"></Link>
+              <Link
+                href={`/${userid}/boardadd`}
+                className="absolute inset-0"
+              ></Link>
             </div>
             <div className="flex flex-col relative w-auto  rounded-lg items-center space-y-1 hover:scale-105 transition py-1 border border-gray-200 shadow-md hover:shadow-none hover:border-green-300">
               <BookUserIcon className="self-center" />
               <h2 className="text-xs mx-2 ">登録者一覧</h2>
-              <Link href={"/tripadd"} className="absolute inset-0"></Link>
+              <Link
+                href={`/${userid}/board`}
+                className="absolute inset-0"
+              ></Link>
             </div>
             <div className="flex flex-col relative w-auto  rounded-lg items-center space-y-1  hover:scale-105 transition py-1 border border-gray-200 shadow-md hover:shadow-none hover:border-green-300">
               <CircleUserIcon className="self-center" />
               <h2 className="text-xs mx-2">マイページ</h2>
-              <Link href={"/"} className="absolute inset-0"></Link>
+              <Link
+                href={`/${userid}/mypage`}
+                className="absolute inset-0"
+              ></Link>
             </div>
             <div className="flex flex-col relative w-auto  rounded-lg items-center space-y-1  hover:scale-105 transition py-1 border border-gray-200 shadow-md hover:shadow-none hover:border-green-300">
               <LogOutIcon className="self-center" />

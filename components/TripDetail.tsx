@@ -7,7 +7,7 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 
 interface TripDetailProps {
-  id?: string;
+  id: string;
 }
 
 type Variant = "None" | "Edit";
@@ -64,7 +64,7 @@ const TripDetail: React.FC<TripDetailProps> = ({ id }) => {
     window.location.reload();
   };
   return (
-    <div className="flex-1 pt-10 px-8 md:px-14 lg:px-28 flex flex-col justify-center bg-gradient-to-b from-green-300 to-green-200 relative">
+    <div className="flex-1 pt-10 px-8 md:px-14 lg:px-28 flex flex-col justify-center  relative">
       <div className="bg-white rounded-3xl flex h-4/5 w-full mb-5 shadow-custom-shadow p-6 relative">
         <div className="w-1/2 flex flex-col pr-5">
           <h2 className="font-bold text-2xl text-gray-700 bg-yellow-200 rounded-lg px-8 py-4 shadow-custom-shadow ">

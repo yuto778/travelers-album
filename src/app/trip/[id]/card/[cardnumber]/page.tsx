@@ -21,12 +21,12 @@ const page = ({
   params: { cardnumber: string };
 }) => {
   return (
-    <div className="flex flex-col h-screen w-full bg-gradient-to-b from-white to-black">
+    <div className="flex flex-col h-screen  w-screen bg-gradient-to-b from-neutral-100 to-green-700">
       {/* /components/Header.tsx */}
       <Header menu />
       <div className="flex overflow-hidden flex-1 flex-col">
         <div className="flex-1 flex flex-col ">
-          <div className="h-12 flex items-center justify-center border-b-2 bg-blue-200">
+          <div className="h-12 flex items-center justify-center border-b-2 ">
             <h2 className="text-2xl font-bold">{cardnumber}</h2>
           </div>
           <div className="h-10 py-8 px-3 flex items-center justify-center border-b-2 space-x-6 md:space-x-10 lg:space-x-14 bg-blue-100">

@@ -22,7 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "../@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Checkbox } from "./ui/checkbox";
 
 const TripAddSchema = z.object({
@@ -51,9 +51,13 @@ const members = {
   },
 };
 
+interface TripAddFormProps {
+  userid?: string;
+}
+
 type TripAddForm = z.infer<typeof TripAddSchema>;
 
-const TripAddForm = () => {
+const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
   const [member, setMember] = useState(members);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
@@ -482,7 +486,7 @@ const TripAddForm = () => {
               variant="outline"
               className="self-center shadow-custom-shadow hover:shadow-none bg-green-200 transition hover:bg-green-400 "
               onClick={() => {
-                router.push("/tripadd/addmember");
+                router.push(`/${userid}/memberadd`);
               }}
             >
               <PlusCircleIcon className="pr-2" />
