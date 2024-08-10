@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import Map, { LocationInfo } from "./Map";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface TripDetailProps {
   id: string;
@@ -74,8 +75,15 @@ const TripDetail: React.FC<TripDetailProps> = ({ id }) => {
             {[...Array(3)].map((_, index) => (
               <div
                 key={index}
-                className="bg-blue-600 rounded-lg aspect-square  shadow-custom-shadow hover:scale-105 transition cursor-pointer hover:shadow-none"
-              ></div>
+                className="bg-blue-600 relative overflow-hidden rounded-lg aspect-square  shadow-custom-shadow hover:scale-105 transition cursor-pointer hover:shadow-none"
+              >
+                <Image
+                  src={"/images/routephoto.jpg"}
+                  alt="写真です"
+                  className="object-cover"
+                  fill
+                />
+              </div>
             ))}
           </div>
           <div className="h-1/6 flex items-center space-x-6 justify-center">
@@ -162,7 +170,7 @@ const TripDetail: React.FC<TripDetailProps> = ({ id }) => {
             variant={"outline"}
             className="top-5 right-5 absolute text-xl shadow-custom-shadow hover:scale-110 transition hover:shadow-none"
           >
-            <PlusCircle /> 旅行を追加
+            <PlusCircle /> カードを追加
           </Button>
         </div>
       )}
