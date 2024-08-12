@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
-const Cardadd = () => {
+const Cardaddform = () => {
   return (
     <>
       <div className="bg-green-400 bg-opacity-25 w-1/2 rounded-xl shadow-custom-shadow flex flex-col px-10 py-10">
@@ -31,4 +31,4 @@ const Cardadd = () => {
   );
 };
 
-export default Cardadd;
+export default Cardaddform;
