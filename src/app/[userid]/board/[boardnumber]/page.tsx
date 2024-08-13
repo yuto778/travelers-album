@@ -4,6 +4,7 @@ import Header from "../../../../../components/Header";
 import { PlusCircleIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../../../../../components/ui/button";
+import "../../../../../styles/global.css";
 
 // メタデータの設定
 export const metadata: Metadata = {
@@ -22,7 +23,7 @@ const page = ({
 }) => {
   return (
     <>
-      <div className="h-screen w-full flex flex-col bg-gradient-to-b from-neutral-100 to-green-700">
+      <div className="h-screen w-full flex flex-col layer-gradient">
         {/* /components/Header.tsx */}
         <Header menu />
         <div className="flex-1 w-full flex flex-col overflow-hidden">

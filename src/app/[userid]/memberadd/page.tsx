@@ -3,6 +3,7 @@ import Header from "../../../../components/Header";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
 import { Metadata } from "next";
+import "../../../../styles/global.css";
 
 export const metadata: Metadata = {
   title: "メンバーの追加",
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 
 const page = () => {
   return (
-    <div className="h-screen w-full flex flex-col bg-gradient-to-b from-neutral-100 to-green-700">
+    <div className="h-screen w-full flex flex-col layer-gradient">
       <Header menu />
       <div className="flex-1  flex flex-col  items-center py-10 ">
         <div className="flex-1 flex flex-col  items-center justify-around w-1/2  py-32 px-10 bg-green-400 bg-opacity-25 shadow-custom-shadow rounded-xl ">

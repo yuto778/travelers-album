@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../../../../components/Header";
 import Image from "next/image";
+import "../../../../styles/global.css";
 
 const Users = ["ゆう", "すずき", "さとさん", "なお"];
 
@@ -10,7 +11,7 @@ const page = ({ params: { userid } }: { params: { userid: string } }) => {
     userid;
   };
   return (
-    <div className="h-screen w-full bg-gradient-to-b from-neutral-100 to-green-700 flex flex-col">
+    <div className="h-screen w-full layer-gradient flex flex-col">
       <Header menu />
       <div className="flex-1 flex items-center justify-center ">
         <div className="h-3/4 w-1/2 bg-green-400 bg-opacity-25 rounded-xl shadow-custom-shadow  px-20  py-7 space-y-10 ">

@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Header from "../../../../../../../components/Header";
 import { Button } from "../../../../../../../components/ui/button";
 import TripDetail from "../../../../../../../components/TripDetail";
+import "../../../../../../../styles/global.css";
 
 // メタデータの設定
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ const page = ({
   params: { cardnumber: string };
 }) => {
   return (
-    <div className="flex flex-col h-screen w-screen bg-gradient-to-b from-neutral-100 to-green-700">
+    <div className="flex flex-col h-screen w-screen layer-gradient">
       {/* /components/Header.tsx */}
       <Header menu />
       <div className="flex overflow-hidden flex-1 flex-col">
