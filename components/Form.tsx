@@ -24,6 +24,7 @@ import { cn } from "../@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./ui/calendar";
 import { ja } from "date-fns/locale";
+import { SignUp } from "@/action/Signup";
 
 const LoginSchema = z.object({
   Email: z.string().email(),
@@ -38,8 +39,8 @@ const SignUpSchema = z.object({
   birthday: z.date(),
 });
 
-type LoginFormSchema = z.infer<typeof LoginSchema>;
-type SignUpFormSchema = z.infer<typeof SignUpSchema>;
+export type LoginFormSchema = z.infer<typeof LoginSchema>;
+export type SignUpFormSchema = z.infer<typeof SignUpSchema>;
 
 type Variant = "LogIn" | "SignUp";
 
@@ -89,10 +90,24 @@ const Form = () => {
     }
   };
 
-  const handleSignUp = () => {
-    SignUpform.reset();
-    toast.success("新規登録に成功");
-    setVariant("LogIn");
+  const handleSignUp = async (value: SignUpFormSchema) => {
+    try {
+      if (value.FirstPassword === value.SecondPassword) {
+        const result = await SignUp(value);
+
+        if (!result.success) {
+          return null;
+        }
+
+        console.log(result.data);
+        toast.success("新規登録に成功");
+
+        SignUpform.reset();
+        setVariant("LogIn");
+      }
+    } catch (error) {
+      console.error(error, "新規登録エラー");
+    }
   };
 
   const handleLogIn = () => {

@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CardPicture {
+  id        String    @id
+  cardId    String
+  picture   String?
+  photoDate DateTime? @db.Date
+  TripCard  TripCard  @relation(fields: [cardId], references: [id])
+}
+
+model FellowTraveler {
+  id                                 Int    @id @default(autoincrement())
+  userId                             String
+  fellowId                           String
+  User_FellowTraveler_fellowIdToUser User   @relation("FellowTraveler_fellowIdToUser", fields: [fellowId], references: [id])
+  User_FellowTraveler_userIdToUser   User   @relation("FellowTraveler_userIdToUser", fields: [userId], references: [id])
+}
+
+model TripBoard {
+  id            String          @id
+  title         String          @db.VarChar(50)
+  startday      DateTime        @db.Date
+  endday        DateTime?       @db.Date
+  thumbnail     String
+  ownerId       String
+  lastUpdate    DateTime        @default(now()) @db.Timestamp(6)
+  User          User            @relation(fields: [ownerId], references: [id])
+  TripCard      TripCard[]
+  TripboardUser TripboardUser[]
+}
+
+model TripCard {
+  id            String        @id
+  boardId       String
+  memo          String?
+  thumbnailId   Int           @default(autoincrement())
+  locationPoint String?
+  CardPicture   CardPicture[]
+  TripBoard     TripBoard     @relation(fields: [boardId], references: [id])
+}
+
+model TripboardUser {
+  id        Int       @id @default(autoincrement())
+  userId    String
+  boardId   String
+  TripBoard TripBoard @relation(fields: [boardId], references: [id])
+  User      User      @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id                                           String           @id
+  email                                        String           @unique
+  password                                     String
+  birthday                                     DateTime
+  icon                                         String?
+  name                                         String           @db.VarChar(50)
+  FellowTraveler_FellowTraveler_fellowIdToUser FellowTraveler[] @relation("FellowTraveler_fellowIdToUser")
+  FellowTraveler_FellowTraveler_userIdToUser   FellowTraveler[] @relation("FellowTraveler_userIdToUser")
+  TripBoard                                    TripBoard[]
+  TripboardUser                                TripboardUser[]
+}
