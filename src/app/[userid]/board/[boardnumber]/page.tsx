@@ -37,6 +37,7 @@ const page = async ({
     }
   } catch (error) {
     console.error("Error fetching session:", error);
+    redirect("/login");
   }
   return (
     <>

@@ -34,6 +34,7 @@ const page = async () => {
     }
   } catch (error) {
     console.error("Error fetching session:", error);
+    redirect("/login");
   }
   return (
     <div className="h-screen w-full flex flex-col layer-gradient">

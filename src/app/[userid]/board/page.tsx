@@ -38,6 +38,7 @@ export default async function Home({
     }
   } catch (error) {
     console.log("セッションのエラー", error);
+    redirect("/login");
   }
   return (
     <>

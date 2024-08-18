@@ -37,6 +37,7 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
     }
   } catch (error) {
     console.error("Error fetching session:", error);
+    redirect("/login");
   }
 
   const datafetch = () => {

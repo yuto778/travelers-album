@@ -20,6 +20,7 @@ const page = async () => {
     }
   } catch (error) {
     console.error("Error fetching session:", error);
+    redirect("/login");
   }
   return (
     <div className="h-screen w-screen flex flex-col bg-gradient-to-b from-neutral-100 to-green-700">
