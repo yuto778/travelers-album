@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 interface MypageProps {
   password: string;
@@ -17,7 +18,16 @@ const Mypage: React.FC<MypageProps> = ({ password }) => {
     useState(false);
   const [isUserPasswordUpdateModalOpen, setIsUserPasswordUpdateModalOpen] =
     useState(false);
-  const { data: session } = useSession();
+
+  const router = useRouter();
+
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
 
   const handleUseridUpdate = async () => {};
 
@@ -136,7 +146,7 @@ const Mypage: React.FC<MypageProps> = ({ password }) => {
           onClick={() => setIsUserPasswordUpdateModalOpen(false)}
         >
           <div
-            className="bg-white p-8 rounded-lg w-3/4 md:w-1/2 h-auto overflow-auto relative flex flex-col"
+            className="bg-white p-8 rounded-lg w-auto h-auto overflow-auto relative flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-2xl font-bold  self-center">

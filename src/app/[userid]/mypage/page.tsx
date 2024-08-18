@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 // params:{userid}でurlの[userid]を取得
 const page = async ({ params: { userid } }: { params: { userid: string } }) => {
   console.log("mypageでFetching session...");
-  let UserEmail;
+  let UserEmail, password;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -33,13 +33,16 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
       UserEmail = session.user.email;
 
       console.log(UserEmail);
+
+      const user = await prisma.user.findUnique({
+        where: { email: UserEmail },
+      });
+      password = user.password;
     }
   } catch (error) {
     console.error("Error fetching session:", error);
+    redirect("/login");
   }
-
-  const user = await prisma.user.findUnique({ where: { email: UserEmail } });
-  const { password } = user;
 
   return (
     <>
