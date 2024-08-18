@@ -1,7 +1,7 @@
 "use server";
 
 import { SignUpFormSchema } from "@/components/Form";
-import { prisma } from "@/prisma/client";
+import { prisma } from "@/lib/client";
 // /actions/SignUp.ts
 
 import bcrypt from "bcrypt";
@@ -13,9 +13,10 @@ export const SignUp = async (value: SignUpFormSchema) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(value.FirstPassword, saltRounds);
 
+    console.log(hashedPassword);
+
     // ユーザーデータを準備
     const userData = {
-      id: "3030",
       name: value.UserName,
       email: value.Email,
       password: hashedPassword,

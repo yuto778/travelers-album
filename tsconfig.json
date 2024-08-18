@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "next-auth":["./node_modules/next-auth"]
     },
     "lib": [
       "dom",
@@ -25,6 +26,7 @@
         "name": "next"
       }
     ],
+  
     "target": "ES2017"
   },
   "include": [

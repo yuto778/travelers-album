@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "CardPicture" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(50) NOT NULL,
     "cardId" TEXT NOT NULL,
     "picture" TEXT,
     "photoDate" DATE,
@@ -19,7 +19,7 @@ CREATE TABLE "FellowTraveler" (
 
 -- CreateTable
 CREATE TABLE "TripBoard" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(50) NOT NULL,
     "title" VARCHAR(50) NOT NULL,
     "startday" DATE NOT NULL,
     "endday" DATE,
@@ -52,18 +52,33 @@ CREATE TABLE "TripboardUser" (
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(50) NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "birthday" TEXT NOT NULL,
+    "birthday" TIMESTAMP(3) NOT NULL,
     "icon" TEXT,
     "name" VARCHAR(50) NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Testuser" (
+    "id" VARCHAR(50) NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "birthday" TIMESTAMP(3) NOT NULL,
+    "icon" TEXT,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "Testuser_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Testuser_email_key" ON "Testuser"("email");
 
 -- AddForeignKey
 ALTER TABLE "CardPicture" ADD CONSTRAINT "CardPicture_cardId_fkey" FOREIGN KEY ("cardId") REFERENCES "TripCard"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

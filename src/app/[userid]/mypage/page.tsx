@@ -4,6 +4,12 @@ import { Input } from "../../../../components/ui/input";
 import { Metadata } from "next";
 import "../../../../styles/global.css";
 import Image from "next/image";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/client";
+import Email from "next-auth/providers/email";
+import Mypage from "./Mypage";
 
 export const metadata: Metadata = {
   title: "マイページ",
@@ -13,44 +19,36 @@ export const metadata: Metadata = {
 };
 
 // params:{userid}でurlの[userid]を取得
-const page = ({ params: { userid } }: { params: { userid: string } }) => {
-  const datafetch = async () => {
-    // データフェッチ
-    userid;
-  };
+const page = async ({ params: { userid } }: { params: { userid: string } }) => {
+  console.log("mypageでFetching session...");
+  let UserEmail;
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      console.log("mypageでセッション情報確保ならず");
+      redirect("/login");
+    } else {
+      console.log("mypageでセッションの情報を出してみます", session);
+
+      UserEmail = session.user.email;
+
+      console.log(UserEmail);
+    }
+  } catch (error) {
+    console.error("Error fetching session:", error);
+  }
+
+  const user = await prisma.user.findUnique({ where: { email: UserEmail } });
+  const { password } = user;
+
   return (
-    <div className="w-full h-screen flex flex-col  layer-gradient">
-      {/* /components/Header.tsx */}
-      <Header menu />
-      <div className="flex items-center justify-center flex-1 ">
-        <div className="bg-green-400 bg-opacity-25 px-20 py-10 w-1/2 rounded-2xl shadow-custom-shadow flex flex-col items-center space-y-5  ">
-          <h2 className="text-2xl font-bold">マイページ</h2>
-          <div className="flex w-2/3  justify-around items-center ">
-            <div className="bg-gray-400 size-20 rounded-full relative overflow-hidden">
-              <Image
-                src={"/images/routephoto.jpg"}
-                fill
-                className="object-cover"
-                alt="仮の写真です"
-              />
-            </div>
-            <span className="underline text-xl">名前</span>
-          </div>
-          <div className="space-y-2 w-2/3">
-            <h2 className="text-xl">ユーザーID</h2>
-            <Input />
-          </div>
-          <div className="space-y-2 w-2/3">
-            <h2 className="text-xl">メールアドレス</h2>
-            <Input />
-          </div>
-          <div className="space-y-2 w-2/3">
-            <h2 className="text-xl">パスワード</h2>
-            <Input />
-          </div>
-        </div>
+    <>
+      <div className="w-full h-screen flex flex-col  layer-gradient">
+        {/* /components/Header.tsx */}
+        <Header menu />
+        <Mypage password={password} />
       </div>
-    </div>
+    </>
   );
 };
 

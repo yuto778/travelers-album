@@ -17,13 +17,9 @@ const Notifi = () => {
     setTripmodal(true);
   };
 
-  const handleoksubmit = () => {
-    router.refresh();
-  };
+  const handlesubmit = () => {};
 
-  const handleXsubmit = () => {
-    router.refresh();
-  };
+  const handleXsubmit = () => {};
 
   return (
     <>
@@ -34,7 +30,7 @@ const Notifi = () => {
         <div className="flex space-x-5">
           <div
             className="bg-slate-300 rounded-full p-2 cursor-pointer"
-            onClick={handleoksubmit}
+            onClick={handlesubmit}
           >
             <Circle className="text-red-600" />
           </div>

@@ -1,9 +1,16 @@
+// /app/[userid]/board
+
 import { PlusCircle, Trash2 } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 import Header from "../../../../components/Header";
 import "../../../../styles/global.css";
+import { authOptions } from "../../api/auth/[...nextauth]/route";
+import { getServerSession } from "next-auth/next";
+import { log } from "console";
+import SessionChecker from "@/components/SessionChecker";
 
 export const metadata: Metadata = {
   title: "ホーム",
@@ -18,6 +25,20 @@ export default async function Home({
 }: {
   params: { userid: string };
 }) {
+  console.log("Fetching session...");
+  let Userid;
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      console.log("セッション情報確保ならず");
+      redirect("/login");
+    } else {
+      console.log("セッションの情報を出してみます", session);
+      Userid = session.user.id;
+    }
+  } catch (error) {
+    console.log("セッションのエラー", error);
+  }
   return (
     <>
       {/* トースターの使用 */}
@@ -60,7 +81,10 @@ export default async function Home({
         <div className="absolute bottom-5 right-3 md:right-5">
           <div className="relative p-2 bg-slate-400 rounded-full  cursor-pointer hover:scale-125 transition shadow-custom-shadow ">
             <PlusCircle className="" />
-            <Link href={"/tripadd"} className="absolute inset-0"></Link>
+            <Link
+              href={`/${Userid}/boardadd`}
+              className="absolute inset-0"
+            ></Link>
           </div>
         </div>
       </div>

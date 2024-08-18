@@ -5,6 +5,9 @@ import { PlusCircleIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../../../../../components/ui/button";
 import "../../../../../styles/global.css";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/src/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
 // メタデータの設定
 export const metadata: Metadata = {
@@ -16,16 +19,30 @@ export const metadata: Metadata = {
 };
 
 // params:{id}でurlの[id]を取得
-const page = ({
+const page = async ({
   params: { userid, boardnumber },
 }: {
   params: { userid; boardnumber: string };
 }) => {
+  console.log("[boardnumber]でFetching session...");
+  let Userid;
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      console.log("[boardnumber]でセッション情報確保ならず");
+      redirect("/login");
+    } else {
+      console.log("[boardnumber]でセッションの情報を出してみます", session);
+      Userid = session.user.id;
+    }
+  } catch (error) {
+    console.error("Error fetching session:", error);
+  }
   return (
     <>
       <div className="h-screen w-full flex flex-col layer-gradient">
         {/* /components/Header.tsx */}
-        <Header menu />
+        <Header menu userid={Userid} />
         <div className="flex-1 w-full flex flex-col overflow-hidden">
           <div className="h-16 w-full flex items-center justify-center border-b-2 border-gray-400  ">
             {boardnumber} : page

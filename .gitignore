@@ -29,11 +29,12 @@ yarn-error.log*
 
 # local env files
 .env*.local
-/supabase
-/src/app/dev
+
 
 # vercel
 .vercel
+/supabase
+/src/app/dev
 
 # typescript
 *.tsbuildinfo

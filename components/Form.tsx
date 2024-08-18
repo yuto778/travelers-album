@@ -25,6 +25,7 @@ import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./ui/calendar";
 import { ja } from "date-fns/locale";
 import { SignUp } from "@/action/Signup";
+import { getSession, signIn } from "next-auth/react";
 
 const LoginSchema = z.object({
   Email: z.string().email(),
@@ -45,6 +46,7 @@ export type SignUpFormSchema = z.infer<typeof SignUpSchema>;
 type Variant = "LogIn" | "SignUp";
 
 const Form = () => {
+  const [error, setError] = useState<string | null>(null);
   const [variant, setVariant] = useState<Variant>("LogIn");
   const [BirthdayCalendarMonth, setbirthdayCalendarMonth] = useState<Date>(
     new Date()
@@ -90,10 +92,14 @@ const Form = () => {
     }
   };
 
+  //サインアップの記入欄が定義したものに合っていた場合に実行される関数
   const handleSignUp = async (value: SignUpFormSchema) => {
     try {
+      //FirstpasswordとSeccondpasswordの検証
       if (value.FirstPassword === value.SecondPassword) {
+        //同じであればSignUp()サーバーアクション
         const result = await SignUp(value);
+        console.log(result);
 
         if (!result.success) {
           return null;
@@ -110,10 +116,30 @@ const Form = () => {
     }
   };
 
-  const handleLogIn = () => {
-    toast.success("ログインに成功！");
-    Loginform.reset();
-    router.push("/");
+  //ログインの記入欄が定義したものに合っていた場合に実行される関数
+  const handleLogIn = async (value: LoginFormSchema) => {
+    try {
+      const result = await signIn("credentials", {
+        email: value.Email,
+        password: value.Password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("ログインに失敗しました");
+      } else {
+        // セッション情報を取得
+        toast.success("ログインに成功！！！");
+        const session = await getSession();
+        if (session?.user?.id) {
+          router.push(`/${session.user.id}/board`);
+        } else {
+          setError("ユーザーIDが取得できませんでした");
+        }
+      }
+    } catch (error) {
+      setError("エラーが発生しました");
+    }
   };
 
   return (
@@ -358,12 +384,12 @@ const Form = () => {
             </HookForm>
           </>
         )}
-        <h2
+        <p
           onClick={handlevariant}
           className="text-center cursor-pointer underline text-gray-700"
         >
           {variant === "LogIn" ? "新規登録へ" : "ログインへ"}
-        </h2>
+        </p>
       </div>
     </>
   );
