@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 // params:{userid}でurlの[userid]を取得
 const page = async ({ params: { userid } }: { params: { userid: string } }) => {
   console.log("mypageでFetching session...");
-  let UserEmail, password;
+  let UserId, UserEmail, password;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -31,12 +31,14 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
       console.log("mypageでセッションの情報を出してみます", session);
 
       UserEmail = session.user.email;
+      UserId = session.user.id;
 
       console.log(UserEmail);
 
-      const user = await prisma.user.findUnique({
-        where: { email: UserEmail },
+      const user = await prisma.users.findUnique({
+        where: { id: UserId },
       });
+      UserEmail = user.email;
       password = user.password;
     }
   } catch (error) {
@@ -49,7 +51,7 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
       <div className="w-full h-screen flex flex-col  layer-gradient">
         {/* /components/Header.tsx */}
         <Header menu />
-        <Mypage password={password} />
+        <Mypage email={UserEmail} password={password} />
       </div>
     </>
   );

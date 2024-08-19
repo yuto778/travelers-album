@@ -1,11 +1,12 @@
 "use server";
 
-import { prisma } from "@/prisma/client";
+import { prisma } from "@/lib/client";
+
 // /action/GetUser.tsx
 
 export const getAllUser = async () => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.users.findMany();
 
     if (users.length === 0) {
       return { success: false, message: "ユーザーが見つかりませんでした" };

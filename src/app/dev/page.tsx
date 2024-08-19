@@ -13,7 +13,7 @@ const formatDate = (dateString) => {
 };
 
 const page = async () => {
-  const users = await prisma.user.findMany();
+  const users = await prisma.users.findMany();
 
   console.log(formatDate(users[0].birthday));
 

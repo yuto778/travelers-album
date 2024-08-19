@@ -2,10 +2,10 @@
 
 import { SignUpFormSchema } from "@/components/Form";
 import { prisma } from "@/lib/client";
+import { v4 as uuidv4 } from "uuid";
 // /actions/SignUp.ts
 
 import bcrypt from "bcrypt";
-import { stringify } from "querystring";
 
 export const SignUp = async (value: SignUpFormSchema) => {
   try {
@@ -15,15 +15,19 @@ export const SignUp = async (value: SignUpFormSchema) => {
 
     console.log(hashedPassword);
 
+    const uuid = uuidv4();
+
     // ユーザーデータを準備
     const userData = {
+      id: uuid,
+      find_id: uuid,
       name: value.UserName,
       email: value.Email,
       password: hashedPassword,
       birthday: value.birthday,
     };
 
-    const newUser = await prisma.user.create({
+    const newUser = await prisma.users.create({
       data: userData,
     });
 

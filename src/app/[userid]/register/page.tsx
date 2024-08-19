@@ -27,10 +27,10 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
       UserEmail = session.user.email;
 
       console.log(Username, UserId, UserEmail);
-      registers = await prisma.fellowTraveler.findMany({
-        where: { userId: UserId },
+      registers = await prisma.fellowtravelers.findMany({
+        where: { user_id: UserId },
         include: {
-          User_FellowTraveler_fellowIdToUser: true, // fellowIdに関連するユーザー情報を含める
+          : true, // fellowIdに関連するユーザー情報を含める
         },
       });
       console.log(registers);

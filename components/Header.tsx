@@ -31,12 +31,6 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
 
   const { data: session, status } = useSession();
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
-
   // セッションがロード中または未認証の場合は何も表示しない
   if (status === "loading" || status === "unauthenticated") {
     return (
@@ -73,10 +67,8 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
 
   return (
     <div
-      suppressHydrationWarning
       className={cn(
-        "h-20 flex items-center justify-between  px-4  md:h-20 md:px-12 ",
-        className
+        "h-20 flex items-center justify-between  px-4  md:h-20 md:px-12 "
       )}
     >
       <Link

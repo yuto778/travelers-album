@@ -44,7 +44,7 @@ export default async function Home({
     <>
       {/* トースターの使用 */}
       <Toaster />
-      <div className="flex flex-col h-screen w-full  relative layer-gradient">
+      <div className="flex flex-col h-screen w-screen  layer-gradient">
         {/* components/Header.tsx */}
         <Header menu />
         <div className="flex flex-col flex-1 overflow-hidden">

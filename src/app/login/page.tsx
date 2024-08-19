@@ -1,10 +1,14 @@
 // /app/login/page.tsx
 
 import { Metadata } from "next";
+import { useSession } from "next-auth/react";
+import { Toaster } from "react-hot-toast";
 import Form from "../../../components/Form";
 import Header from "../../../components/Header";
-import { Toaster } from "react-hot-toast";
 import "../../../styles/global.css";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
 // メタデータの設定
 export const metadata: Metadata = {
@@ -15,7 +19,14 @@ export const metadata: Metadata = {
   },
 };
 
-const page = () => {
+const page = async () => {
+  console.log("loginでsession取得");
+  const session = await getServerSession(authOptions);
+
+  if (session) {
+    redirect(`/${session.user.id}/board`);
+  }
+
   return (
     <>
       {/* トースターの表示（1秒表示) */}

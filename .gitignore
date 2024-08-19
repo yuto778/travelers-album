@@ -120,6 +120,9 @@ web_modules/
 .cache
 .parcel-cache
 
+.env
+.env.local
+
 # Next.js build output
 .next
 out
