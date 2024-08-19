@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import "../../../../styles/global.css";
 import Image from "next/image";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../api/auth/[...nextauth]/route";
+import { authOptions } from "@/@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/client";
 import Email from "next-auth/providers/email";

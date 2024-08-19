@@ -2,7 +2,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header from "../../../../components/Header";
-import { authOptions } from "../../api/auth/[...nextauth]/route";
+import { authOptions } from "@/@/lib/auth";
 import Notifi from "./Notifi";
 
 const page = async () => {

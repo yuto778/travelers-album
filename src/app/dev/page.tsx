@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/client";
-import Dev from "./Dev";
 
 //デート型を日本語表記にする関数（年月日曜日）
 const formatDate = (dateString) => {
@@ -30,7 +29,6 @@ const page = async () => {
             <h2>誕生日: {formatDate(user.birthday)}</h2>
           </div>
         ))}
-        <Dev />
       </div>
     </>
   );

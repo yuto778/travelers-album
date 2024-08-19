@@ -3,7 +3,7 @@ import Header from "../../../../components/Header";
 import TripAddForm from "../../../../components/TripAddForm";
 import "../../../../styles/global.css";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../api/auth/[...nextauth]/route";
+import { authOptions } from "@/@/lib/auth";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {

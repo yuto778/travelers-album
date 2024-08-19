@@ -1,20 +1,16 @@
 import { prisma } from "@/lib/client";
-import { FellowTraveler, User } from "@prisma/client";
+
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import Header from "../../../../components/Header";
 import "../../../../styles/global.css";
-import { authOptions } from "../../api/auth/[...nextauth]/route";
-
-type FellowTravelerWithUser = FellowTraveler & {
-  User_FellowTraveler_fellowIdToUser: User;
-};
+import { authOptions } from "@/@/lib/auth";
 
 const page = async ({ params: { userid } }: { params: { userid: string } }) => {
   console.log("registerでFetching session...");
   let Username, UserId, UserEmail;
-  let registers: FellowTravelerWithUser[] = [];
+  let registers: [] = [];
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -27,12 +23,7 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
       UserEmail = session.user.email;
 
       console.log(Username, UserId, UserEmail);
-      registers = await prisma.fellowtravelers.findMany({
-        where: { user_id: UserId },
-        include: {
-          : true, // fellowIdに関連するユーザー情報を含める
-        },
-      });
+
       console.log(registers);
     }
   } catch (error) {
@@ -54,7 +45,7 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
             {registers.length === 0 && <div>登録者がいません</div>}
             {registers.map((register, index) => (
               <div
-                key={register.id}
+                key={index}
                 className="border-b-2 border-gray-400 flex items-center  pb-2 px-10"
               >
                 <div className="size-12 bg-slate-500 relative rounded-full overflow-hidden">
@@ -66,9 +57,7 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
                   />
                 </div>
                 <span className="flex-1"></span>
-                <h2 className="text-lg ">
-                  {register.User_FellowTraveler_fellowIdToUser.name}
-                </h2>
+                <h2 className="text-lg ">登録された人が出ます</h2>
               </div>
             ))}
           </div>

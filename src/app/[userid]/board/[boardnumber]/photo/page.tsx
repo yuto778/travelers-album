@@ -3,7 +3,7 @@ import "../../../../../../styles/global.css";
 import Header from "@/components/Header";
 import Image from "next/image";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/src/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/@/lib/auth";
 import { redirect } from "next/navigation";
 
 const page = async ({

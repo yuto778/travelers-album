@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "../../../../../components/ui/button";
 import "../../../../../styles/global.css";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/src/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/@/lib/auth";
 import { redirect } from "next/navigation";
 
 // メタデータの設定

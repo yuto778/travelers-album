@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 import Header from "../../../../components/Header";
 import "../../../../styles/global.css";
-import { authOptions } from "../../api/auth/[...nextauth]/route";
+import { authOptions } from "@/@/lib/auth";
 import { getServerSession } from "next-auth/next";
 import { log } from "console";
 import SessionChecker from "@/components/SessionChecker";
