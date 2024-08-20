@@ -30,7 +30,7 @@ const TripAddSchema = z.object({
   DepartureDate: z.date(),
   ArrivalDate: z.date(),
   Member: z.string(),
-  TopPhoto: z.string(),
+  TopPhoto: z.instanceof(File).optional(),
 });
 
 const members = {
@@ -55,9 +55,11 @@ interface TripAddFormProps {
   userid?: string;
 }
 
-type TripAddForm = z.infer<typeof TripAddSchema>;
+export type TripAddForm = z.infer<typeof TripAddSchema>;
 
 const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
+  const [fileName, setFileName] = useState("");
+  const [preview, setPreview] = useState("");
   const [member, setMember] = useState(members);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
@@ -77,12 +79,13 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
       DepartureDate: new Date(),
       ArrivalDate: new Date(),
       Member: "",
-      TopPhoto: "",
+      TopPhoto: null,
     },
   });
 
-  const Tripadd = () => {
-    router.replace("/tripadd");
+  const Tripaddonsubmit = async (value: TripAddForm) => {
+    try {
+    } catch (error) {}
   };
 
   const updateCheckboxStates = () => {
@@ -143,7 +146,7 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
               旅行ボードを追加
             </h2>
             <form
-              onSubmit={TripAddform.handleSubmit(Tripadd)}
+              onSubmit={TripAddform.handleSubmit(Tripaddonsubmit)}
               className="space-y-8 flex flex-col w-full  "
             >
               <FormField
@@ -407,18 +410,24 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
               <FormField
                 control={TripAddform.control}
                 name="TopPhoto"
-                render={({ field }) => (
-                  <FormItem className="flex items-center w-full pr-16 space-y-0 relative">
-                    <FormLabel className="text-lg md:text-xl w-1/3  sm:w-1/4 text-center">
-                      トップ写真 :
-                    </FormLabel>
-                    <FormControl className="flex-1">
-                      <Input
-                        type="file"
-                        placeholder="PhotoPath"
-                        {...field}
-                        className=" shadow-custom-shadow hover:bg-gray-100  transition cursor-pointer"
-                      />
+                render={({ field: { onChange, value, ...rest } }) => (
+                  <FormItem>
+                    <FormLabel>ファイルアップロード</FormLabel>
+                    <FormControl>
+                      <div>
+                        <Input
+                          type="file"
+                          {...rest}
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              setFileName(file.name);
+                              onChange(file);
+                            }
+                          }}
+                        />
+                        {fileName && <p>現在のファイル: {fileName}</p>}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

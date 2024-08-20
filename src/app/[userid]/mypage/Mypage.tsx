@@ -1,15 +1,13 @@
 "use client";
 
+// /Mypage.tsx
+
+import { EmailUpdate } from "@/action/EmailUpdate";
+import { IconUpdate } from "@/action/IconUpdate";
+import { IdUpdate } from "@/action/IdUpdate";
+import { NameUpdate } from "@/action/NameUpdate";
+import { PasswordUpdate } from "@/action/PasswordUpdate";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { X } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -19,26 +17,38 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { PasswordUpdate } from "@/action/PasswordUpdate";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Users } from "@prisma/client";
+import { X } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
-import { EmailUpdate } from "@/action/EmailUpdate";
-import { NameUpdate } from "@/action/NameUpdate";
-import { id } from "date-fns/locale";
+import { z } from "zod";
 
 interface MypageProps {
-  password: string;
-  email: string;
+  user: Users;
 }
+
+const UserIconUpdateformSchema = z.object({
+  icon: z.instanceof(File).optional(),
+});
 
 const UserNameUpdateformSchema = z.object({
   UserName: z.string(),
 });
+
 const UserIdUpdateformSchema = z.object({
   UserId: z.string().min(6),
 });
+
 const UserEmailUpdateformSchema = z.object({
   Email: z.string().email(),
 });
+
 const UserPasswordUpdateformSchema = z
   .object({
     FirstPassword: z
@@ -53,6 +63,7 @@ const UserPasswordUpdateformSchema = z
     path: ["SecondPassword"],
   });
 
+export type UserIconUpdateForm = z.infer<typeof UserIconUpdateformSchema>;
 export type UserNameUpdateForm = z.infer<typeof UserNameUpdateformSchema>;
 export type UserIdUpdateForm = z.infer<typeof UserIdUpdateformSchema>;
 export type UserEmailUpdateForm = z.infer<typeof UserEmailUpdateformSchema>;
@@ -60,7 +71,11 @@ export type UserPasswordUpdateForm = z.infer<
   typeof UserPasswordUpdateformSchema
 >;
 
-const Mypage: React.FC<MypageProps> = ({ password, email }) => {
+const Mypage: React.FC<MypageProps> = ({ user }) => {
+  const [isUserIconUpdateModalOpen, setIsUserIconUpdateModalOpen] =
+    useState(false);
+  const [fileName, setFileName] = useState("");
+  const [preview, setPreview] = useState("");
   const [isUserNameUpdateModalOpen, setIsUserNameUpdateModalOpen] =
     useState(false);
   const [isUseridUpdateModalOpen, setIsUseridUpdateModalOpen] = useState(false);
@@ -79,29 +94,55 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
     }
   }, [status, router]);
 
+  //usericonの更新フォーム
+  const UserIconUpdateform = useForm<UserIconUpdateForm>({
+    resolver: zodResolver(UserIconUpdateformSchema),
+    defaultValues: {
+      icon: null,
+    },
+  });
+
   //usernameの更新フォーム
   const UserNameUpdateform = useForm<UserNameUpdateForm>({
     resolver: zodResolver(UserNameUpdateformSchema),
     defaultValues: {
-      UserName: `${session.user.name}`,
+      UserName: user.name,
     },
   });
+
+  useEffect(() => {
+    UserNameUpdateform.reset({
+      UserName: user.name,
+    });
+  }, [user.name, UserNameUpdateform]);
 
   //useridの更新フォーム
   const UserIdUpdateform = useForm<UserIdUpdateForm>({
     resolver: zodResolver(UserIdUpdateformSchema),
     defaultValues: {
-      UserId: `${session.user.id}`,
+      UserId: `${user.find_id}`,
     },
   });
+
+  useEffect(() => {
+    UserIdUpdateform.reset({
+      UserId: user.find_id,
+    });
+  }, [user.find_id, UserIdUpdateform]);
 
   //useremailの更新フォーム
   const UserEmailUpdateform = useForm<UserEmailUpdateForm>({
     resolver: zodResolver(UserEmailUpdateformSchema),
     defaultValues: {
-      Email: `${email}`,
+      Email: `${user.email}`,
     },
   });
+
+  useEffect(() => {
+    UserEmailUpdateform.reset({
+      Email: user.email,
+    });
+  }, [user.email, UserEmailUpdateform]);
 
   //userpasswordの更新フォーム
   const UserPasswordUpdateform = useForm<UserPasswordUpdateForm>({
@@ -114,9 +155,29 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
 
   const handleUseridUpdate = async () => {};
 
+  const UserIconUpdateSubmit = async (value: UserIconUpdateForm) => {
+    try {
+      const formData = new FormData();
+      if (value.icon) {
+        formData.append("icon", value.icon);
+      }
+      const result = await IconUpdate(formData, session.user.id);
+      if (!result.success) {
+        return null;
+      }
+      toast.success("iconの更新に成功");
+      UserIconUpdateform.reset();
+      setIsUserIconUpdateModalOpen(false);
+      router.refresh();
+    } catch (error) {
+      toast.error("iconの更新に失敗");
+      console.error("iconの更新に失敗したよ", error);
+    }
+  };
+
   const UsernameUpdateSubmit = async (value: UserNameUpdateForm) => {
     try {
-      const result = await NameUpdate(value, session.user.id);
+      const result = await NameUpdate(value, user.id);
       if (!result.success) {
         return null;
       }
@@ -126,11 +187,25 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
       router.refresh();
     } catch (error) {
       toast.error("名前の更新に失敗");
-      console.error("メールアドレスの更新に失敗したよ", error);
+      console.error("名前の更新に失敗したよ", error);
     }
   };
 
-  const UserIdUpdateSubmit = async (value: UserIdUpdateForm) => {};
+  const UserIdUpdateSubmit = async (value: UserIdUpdateForm) => {
+    try {
+      const result = await IdUpdate(value, session.user.id);
+      if (!result.success) {
+        return null;
+      }
+      toast.success("useridの更新に成功");
+      UserIdUpdateform.reset();
+      setIsUseridUpdateModalOpen(false);
+      router.refresh();
+    } catch (error) {
+      toast.error("useridの更新に失敗");
+      console.error("useridの更新に失敗したよ", error);
+    }
+  };
 
   const UserEmailUpdateSubmit = async (value: UserEmailUpdateForm) => {
     try {
@@ -142,7 +217,7 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
       toast.success("メールアドレスの更新に成功");
       UserEmailUpdateform.reset();
       setIsUserEmailUpdateModalOpen(false);
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       toast.error("メールアドレスの更新に失敗");
       console.error("メールアドレスの更新に失敗したよ", error);
@@ -163,6 +238,7 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
         toast.success("パスワードの更新に成功");
         UserPasswordUpdateform.reset();
         setIsUserPasswordUpdateModalOpen(false);
+        router.refresh();
       } else {
         toast.error("パスワードが一致しません");
       }
@@ -179,9 +255,12 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
         <div className="bg-green-400 bg-opacity-25 px-20 py-10 w-1/2 rounded-2xl shadow-custom-shadow flex flex-col items-center space-y-5  ">
           <h2 className="text-2xl font-bold">マイページ</h2>
           <div className="flex w-2/3  justify-around items-center ">
-            <div className="bg-gray-400 size-20 rounded-full relative overflow-hidden">
+            <div
+              className="bg-gray-400 size-20 rounded-full relative overflow-hidden cursor-pointer"
+              onClick={() => setIsUserIconUpdateModalOpen(true)}
+            >
               <Image
-                src={"/icons/icon.jpeg"}
+                src={user.icon !== null ? `${user.icon}` : "/icons/Icon.jpeg"}
                 fill
                 className="object-cover"
                 alt="仮の写真です"
@@ -191,7 +270,7 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
               className="underline text-2xl cursor-pointer"
               onClick={() => setIsUserNameUpdateModalOpen(true)}
             >
-              {session.user.name}
+              {user.name}
             </span>
           </div>
           <div className="space-y-2 w-2/3">
@@ -200,7 +279,7 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
               className="bg-white px-3 py-1 rounded-sm overflow-x-auto whitespace-nowrap cursor-pointer"
               onClick={() => setIsUseridUpdateModalOpen(true)}
             >
-              {session.user.id}
+              {user.find_id}
             </h2>
           </div>
           <div className="space-y-2 w-2/3">
@@ -209,7 +288,7 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
               className="bg-white px-3 py-1 rounded-sm cursor-pointer"
               onClick={() => setIsUserEmailUpdateModalOpen(true)}
             >
-              {email}
+              {user.email}
             </h2>
           </div>
           <div className="space-y-2 w-2/3">
@@ -218,11 +297,84 @@ const Mypage: React.FC<MypageProps> = ({ password, email }) => {
               className="bg-white px-3 py-1  rounded-sm overflow-x-auto whitespace-nowrap cursor-pointer"
               onClick={() => setIsUserPasswordUpdateModalOpen(true)}
             >
-              {"*".repeat(password.length)}
+              {"*".repeat(user.password.length)}
             </h2>
           </div>
         </div>
       </div>
+      {isUserIconUpdateModalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center z-50"
+          onClick={() => setIsUserIconUpdateModalOpen(false)}
+        >
+          <div
+            className="bg-white p-8 rounded-lg w-auto md:w-1/2 h-auto overflow-auto relative flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold  self-center">
+              ユーザーIDを変更
+            </h2>
+            <div
+              onClick={() => {
+                setIsUserIconUpdateModalOpen(false),
+                  setPreview(""),
+                  setFileName("");
+              }}
+              className="absolute top-4 right-4 bg-slate-200 rounded-full p-2 hover:scale-105 cursor-pointer shadow-custom-shadow hover:shadow-none transition"
+            >
+              <X />
+            </div>
+            <Form {...UserIconUpdateform}>
+              <form
+                onSubmit={UserIconUpdateform.handleSubmit(UserIconUpdateSubmit)}
+                className="flex flex-col space-y-5"
+              >
+                <FormField
+                  control={UserIconUpdateform.control}
+                  name="icon"
+                  render={({ field: { onChange, value, ...rest } }) => (
+                    <FormItem>
+                      <FormLabel>ファイルアップロード</FormLabel>
+                      <FormControl>
+                        <div>
+                          <Input
+                            type="file"
+                            {...rest}
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                setPreview(URL.createObjectURL(file));
+                                setFileName(file.name);
+                                onChange(file);
+                              }
+                            }}
+                          />
+                          {fileName && <p>現在のファイル: {fileName}</p>}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {preview && (
+                  <>
+                    <div className="m-auto">
+                      <img
+                        src={preview}
+                        alt="プレビュー"
+                        style={{ maxWidth: "200px" }}
+                      />
+                    </div>
+                  </>
+                )}
+                <Button type="submit" className="self-center">
+                  アップロード
+                </Button>
+              </form>
+            </Form>
+          </div>
+        </div>
+      )}
       {isUserNameUpdateModalOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center z-50"

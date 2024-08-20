@@ -7,25 +7,24 @@ datasource db {
   url      = env("DIRECT_URL")
 }
 
+// ユーザー情報を記録するテーブル
 model Users {
-  id                  String             @id @default(uuid()) @db.VarChar(50)
-  find_id             String             @unique @default(uuid()) @db.VarChar(50)
-  name                String             @db.VarChar(50)
-  email               String             @unique
-  password            String
-  birthday            DateTime           @db.Date
-  icon                String?
-  Fellowtravelers     Fellowtravelers[]  @relation("UserFellowTravelers")
-  FellowTo            Fellowtravelers[]  @relation("FellowToUser")
-  Tripboards_Users    Tripboards_Users[]
-  OwnedTripboards     Tripboards[]       @relation("TripboardOwner")
-  InvitedToTripboards Tripboards_Users[] @relation("InvitedUser")
+  id               String             @id @default(uuid()) @db.VarChar(50)
+  find_id          String             @unique @default(uuid()) @db.VarChar(50)
+  name             String             @db.VarChar(50)
+  email            String             @unique
+  password         String
+  birthday         DateTime           @db.Date
+  icon             String?
+  Fellowtravelers  Fellowtravelers[]  @relation("UserToFellowtraveler")
+  FellowOf         Fellowtravelers[]  @relation("FellowToUser")
+  Tripboards_Users Tripboards_Users[] @relation("UsertoTripboards_Users")
 }
 
 model Fellowtravelers {
   id        Int     @id @default(autoincrement())
   user_id   String
-  user      Users   @relation("UserFellowTravelers", fields: [user_id], references: [id])
+  user      Users   @relation("UserToFellowtraveler", fields: [user_id], references: [id])
   fellow_id String?
   fellow    Users?  @relation("FellowToUser", fields: [fellow_id], references: [id])
 }
@@ -33,40 +32,38 @@ model Fellowtravelers {
 model Tripboards_Users {
   id            Int        @id @default(autoincrement())
   user_id       String
-  user          Users      @relation(fields: [user_id], references: [id])
+  user          Users      @relation("UsertoTripboards_Users", fields: [user_id], references: [id])
   tripboard_id  String
-  tripboard     Tripboards @relation(fields: [tripboard_id], references: [id])
+  tripboard     Tripboards @relation("TripBords", fields: [tripboard_id], references: [id])
   inviteuser_id String
-  inviteuser    Users      @relation("InvitedUser", fields: [inviteuser_id], references: [id])
-  repestion     Boolean?
+  reqestion     Boolean?
 }
 
 model Tripboards {
-  id               String             @id @default(uuid()) @db.VarChar(50)
-  title            String             @db.VarChar(50)
-  thumbnail        String
-  owner_id         String
-  owner            Users              @relation("TripboardOwner", fields: [owner_id], references: [id])
-  start_at         DateTime           @db.Date
-  end_at           DateTime?          @db.Date
-  lastupdate_at    DateTime           @default(now()) @db.Timestamp(6)
-  Tripcards        Tripcards[]
-  Tripboards_Users Tripboards_Users[]
+  id              String             @id @default(uuid()) @db.VarChar(50)
+  title           String             @db.VarChar(50)
+  thumbnail       String
+  owner_id        String
+  start_at        DateTime           @db.Date
+  end_at          DateTime?          @db.Date
+  lastupdate_at   DateTime           @default(now()) @db.Timestamp(6)
+  Tripcards       Tripcards[]        @relation("Tripboards")
+  Tripboars_Users Tripboards_Users[] @relation("TripBords")
 }
 
 model Tripcards {
   id           String         @id @default(uuid())
   board_id     String
-  TripBoard    Tripboards     @relation(fields: [board_id], references: [id])
+  TripBoard    Tripboards     @relation("Tripboards", fields: [board_id], references: [id])
   memo         String?
-  thumbnail    String?
-  Cardpictures Cardpictures[]
+  thumbnail    Int            @default(autoincrement())
+  Cardpictures Cardpictures[] @relation("Cardpicture")
 }
 
 model Cardpictures {
   id              String    @id @default(uuid()) @db.VarChar(50)
   tripcard_id     String
-  Tripcard        Tripcards @relation(fields: [tripcard_id], references: [id])
+  Tripcard        Tripcards @relation("Cardpicture", fields: [tripcard_id], references: [id])
   picture_url     String?
   take_at         DateTime? @db.Date
   location_pointx Float

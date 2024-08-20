@@ -1,15 +1,16 @@
-import React from "react";
-import Header from "../../../../components/Header";
-import { Input } from "../../../../components/ui/input";
-import { Metadata } from "next";
-import "../../../../styles/global.css";
-import Image from "next/image";
-import { getServerSession } from "next-auth";
+// /app/[userid]/mypage/page.tsx
+
 import { authOptions } from "@/@/lib/auth";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/client";
-import Email from "next-auth/providers/email";
+import { Metadata } from "next";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import Header from "../../../../components/Header";
+import "../../../../styles/global.css";
 import Mypage from "./Mypage";
+import { Users } from "@prisma/client";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "マイページ",
@@ -21,7 +22,8 @@ export const metadata: Metadata = {
 // params:{userid}でurlの[userid]を取得
 const page = async ({ params: { userid } }: { params: { userid: string } }) => {
   console.log("mypageでFetching session...");
-  let UserId, UserEmail, password;
+
+  let user: Users | null = null;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -30,16 +32,9 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
     } else {
       console.log("mypageでセッションの情報を出してみます", session);
 
-      UserEmail = session.user.email;
-      UserId = session.user.id;
-
-      console.log(UserEmail);
-
-      const user = await prisma.users.findUnique({
-        where: { id: UserId },
+      user = await prisma.users.findUnique({
+        where: { id: session.user.id },
       });
-      UserEmail = user.email;
-      password = user.password;
     }
   } catch (error) {
     console.error("Error fetching session:", error);
@@ -51,7 +46,7 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
       <div className="w-full h-screen flex flex-col  layer-gradient">
         {/* /components/Header.tsx */}
         <Header menu />
-        <Mypage email={UserEmail} password={password} />
+        <Mypage user={user} />
       </div>
     </>
   );
