@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 // /actions/SignUp.ts
 
 import bcrypt from "bcrypt";
+import { icons } from "lucide-react";
 
 export const SignUp = async (value: SignUpFormSchema) => {
   try {
@@ -23,6 +24,7 @@ export const SignUp = async (value: SignUpFormSchema) => {
       find_id: uuid,
       name: value.UserName,
       email: value.Email,
+      icon: "/icons/Icon.jpeg",
       password: hashedPassword,
       birthday: value.birthday,
     };

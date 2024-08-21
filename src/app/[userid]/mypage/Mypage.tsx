@@ -260,7 +260,7 @@ const Mypage: React.FC<MypageProps> = ({ user }) => {
               onClick={() => setIsUserIconUpdateModalOpen(true)}
             >
               <Image
-                src={user.icon !== null ? `${user.icon}` : "/icons/Icon.jpeg"}
+                src={user.icon}
                 fill
                 className="object-cover"
                 alt="仮の写真です"
@@ -311,9 +311,7 @@ const Mypage: React.FC<MypageProps> = ({ user }) => {
             className="bg-white p-8 rounded-lg w-auto md:w-1/2 h-auto overflow-auto relative flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold  self-center">
-              ユーザーIDを変更
-            </h2>
+            <h2 className="text-2xl font-bold  self-center">写真を変更</h2>
             <div
               onClick={() => {
                 setIsUserIconUpdateModalOpen(false),
@@ -384,9 +382,7 @@ const Mypage: React.FC<MypageProps> = ({ user }) => {
             className="bg-white p-8 rounded-lg w-3/4 md:w-1/2 h-auto overflow-auto relative flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold  self-center">
-              ユーザーIDを変更
-            </h2>
+            <h2 className="text-2xl font-bold  self-center">名前を変更</h2>
             <div
               onClick={() => setIsUserNameUpdateModalOpen(false)}
               className="absolute top-4 right-4 bg-slate-200 rounded-full p-2 hover:scale-105 cursor-pointer shadow-custom-shadow hover:shadow-none transition"

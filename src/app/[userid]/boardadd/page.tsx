@@ -5,6 +5,7 @@ import "../../../../styles/global.css";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/@/lib/auth";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/client";
 
 export const metadata: Metadata = {
   title: "旅行追加画面",
@@ -16,31 +17,29 @@ export const metadata: Metadata = {
 
 const page = async ({ params: { userid } }: { params: { userid: string } }) => {
   console.log("boardaddでFetching session...");
-  let Username, UserId, UserEmail;
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      console.log("boardaddでセッション情報確保ならず");
-      redirect("/login");
-    } else {
-      console.log("boardaddでセッションの情報を出してみます", session);
-      Username = session.user.name;
-      UserId = session.user.id;
-      UserEmail = session.user.email;
-
-      console.log(Username, UserId, UserEmail);
-    }
-  } catch (error) {
-    console.error("Error fetching session:", error);
+  const session = await getServerSession(authOptions);
+  if (!session) {
     redirect("/login");
   }
+  const registers = await prisma.fellowtravelers.findMany({
+    where: { user_id: session.user.id },
+    include: { fellow: { select: { name: true, id: true } } },
+  });
+
+  const userfind_id = await prisma.users.findUnique({
+    where: { id: session.user.id },
+    select: { find_id: true },
+  });
+
+  console.log(registers, userfind_id);
+
   return (
     <>
       <div className="h-screen w-full  layer-gradient flex flex-col">
-        <Header menu userid={UserId} />
+        <Header menu />
         <div className="flex-1 flex flex-col ">
           <div className=" flex-1">
-            <TripAddForm userid={userid} />
+            <TripAddForm registers={registers} userid={userfind_id} />
           </div>
         </div>
       </div>

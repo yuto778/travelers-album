@@ -1,35 +1,33 @@
 import { prisma } from "@/lib/client";
 
+import { authOptions } from "@/@/lib/auth";
+import Register from "@/components/Register";
 import { getServerSession } from "next-auth";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import Header from "../../../../components/Header";
 import "../../../../styles/global.css";
-import { authOptions } from "@/@/lib/auth";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "登録者一覧",
+  description: "登録者一覧を表示するページ",
+  icons: { icon: "favicon.png" },
+};
 
 const page = async ({ params: { userid } }: { params: { userid: string } }) => {
   console.log("registerでFetching session...");
-  let Username, UserId, UserEmail;
-  let registers: [] = [];
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      console.log("registerでセッション情報確保ならず");
-      redirect("/login");
-    } else {
-      console.log("registerでセッションの情報を出してみます", session);
-      Username = session.user.name;
-      UserId = session.user.id;
-      UserEmail = session.user.email;
+  const session = await getServerSession(authOptions);
 
-      console.log(Username, UserId, UserEmail);
-
-      console.log(registers);
-    }
-  } catch (error) {
-    console.error("Error fetching session:", error);
+  if (!session) {
     redirect("/login");
   }
+
+  const registers = await prisma.fellowtravelers.findMany({
+    where: { user_id: session.user.id },
+    include: { fellow: { select: { name: true, icon: true } } },
+  });
+
+  console.log(registers);
 
   const datafetch = () => {
     // useridでデータフェッチ
@@ -37,31 +35,9 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
   };
   return (
     <div className="h-screen w-full layer-gradient flex flex-col">
-      <Header menu userid={UserId} />
+      <Header menu />
       <div className="flex-1 flex items-center justify-center ">
-        <div className="h-3/4 w-1/2 bg-green-400 bg-opacity-25 rounded-xl shadow-custom-shadow  px-20  py-7 space-y-10 ">
-          <h2 className="text-center text-2xl font-bold">登録者一覧</h2>
-          <div className="grid grid-cols-2 gap-5 ">
-            {registers.length === 0 && <div>登録者がいません</div>}
-            {registers.map((register, index) => (
-              <div
-                key={index}
-                className="border-b-2 border-gray-400 flex items-center  pb-2 px-10"
-              >
-                <div className="size-12 bg-slate-500 relative rounded-full overflow-hidden">
-                  <Image
-                    src={"/images/routephoto.jpg"}
-                    fill
-                    className="object-cover"
-                    alt="プロフィール写真"
-                  />
-                </div>
-                <span className="flex-1"></span>
-                <h2 className="text-lg ">登録された人が出ます</h2>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Register registers={registers} />
       </div>
     </div>
   );

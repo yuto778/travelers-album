@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DIRECT_URL")
+  url      = env("DATABASE_URL")
 }
 
 // ユーザー情報を記録するテーブル
@@ -19,6 +19,7 @@ model Users {
   Fellowtravelers  Fellowtravelers[]  @relation("UserToFellowtraveler")
   FellowOf         Fellowtravelers[]  @relation("FellowToUser")
   Tripboards_Users Tripboards_Users[] @relation("UsertoTripboards_Users")
+  Owner_id         Tripboards[]
 }
 
 model Fellowtravelers {
@@ -44,6 +45,7 @@ model Tripboards {
   title           String             @db.VarChar(50)
   thumbnail       String
   owner_id        String
+  owner           Users              @relation(fields: [owner_id], references: [id])
   start_at        DateTime           @db.Date
   end_at          DateTime?          @db.Date
   lastupdate_at   DateTime           @default(now()) @db.Timestamp(6)
@@ -56,7 +58,7 @@ model Tripcards {
   board_id     String
   TripBoard    Tripboards     @relation("Tripboards", fields: [board_id], references: [id])
   memo         String?
-  thumbnail    Int            @default(autoincrement())
+  thumbnail    String?
   Cardpictures Cardpictures[] @relation("Cardpicture")
 }
 

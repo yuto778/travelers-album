@@ -32,24 +32,23 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
   const { data: session, status } = useSession();
 
   // セッションがロード中または未認証の場合は何も表示しない
-  if (status === "loading" || status === "unauthenticated") {
-    return (
-      <>
-        <div
-          suppressHydrationWarning={true}
-          className={cn(
-            "h-20 flex items-center justify-between  px-4  md:h-20 md:px-12 ",
-            className
-          )}
-        >
-          <h2 className="font-bold text-2xl md:text-2xl cursor-pointer">
-            Travelers Album
-          </h2>
-          <span className="flex-1"></span>
-        </div>
-      </>
-    );
-  }
+  // if (status === "loading" || status === "unauthenticated") {
+  //   return (
+  //     <>
+  //       <div
+  //         className={cn(
+  //           "h-20 flex items-center justify-between  px-4  md:h-20 md:px-12 ",
+  //           className
+  //         )}
+  //       >
+  //         <h2 className="font-bold text-2xl md:text-2xl cursor-pointer">
+  //           Travelers Album
+  //         </h2>
+  //         <span className="flex-1"></span>
+  //       </div>
+  //     </>
+  //   );
+  // }
 
   const handlelogout = () => {
     router.push("/login");
@@ -72,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
       )}
     >
       <Link
-        href={`/${session.user.id}/board`}
+        href={`/${session?.user.id}/board`}
         className="font-bold text-2xl md:text-2xl cursor-pointer"
       >
         Travelers Album
@@ -88,7 +87,7 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
               <Home className="self-center " />
               <h2 className="text-xs ">ホーム</h2>
               <Link
-                href={`/${session.user.id}/board`}
+                href={`/${session?.user.id}/board`}
                 className="absolute inset-0"
               ></Link>
             </div>
@@ -101,7 +100,7 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
               </div>
               <h2 className="text-xs ">通知</h2>
               <Link
-                href={`/${session.user.id}/notification`}
+                href={`/${session?.user.id}/notification`}
                 className="absolute inset-0"
               ></Link>
             </div>
@@ -109,7 +108,7 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
               <Pen className="self-center" />
               <h2 className="text-xs ">追加</h2>
               <Link
-                href={`/${session.user.id}/boardadd`}
+                href={`/${session?.user.id}/boardadd`}
                 className="absolute inset-0"
               ></Link>
             </div>
@@ -117,7 +116,7 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
               <BookUserIcon className="self-center" />
               <h2 className="text-xs mx-2 ">登録者一覧</h2>
               <Link
-                href={`/${session.user.id}/register`}
+                href={`/${session?.user.id}/register`}
                 className="absolute inset-0"
               ></Link>
             </div>
@@ -125,7 +124,7 @@ const Header: React.FC<HeaderProps> = ({ menu, className, userid }) => {
               <CircleUserIcon className="self-center" />
               <h2 className="text-xs mx-2">マイページ</h2>
               <Link
-                href={`/${session.user.id}/mypage`}
+                href={`/${session?.user.id}/mypage`}
                 className="absolute inset-0"
               ></Link>
             </div>

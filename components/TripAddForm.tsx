@@ -30,37 +30,34 @@ const TripAddSchema = z.object({
   DepartureDate: z.date(),
   ArrivalDate: z.date(),
   Member: z.string(),
-  TopPhoto: z.instanceof(File).optional(),
+  thumbnail: z.instanceof(File).optional(),
 });
 
-const members = {
-  hachi: {
-    id: 1,
-    name: "八村塁",
-    checked: false,
-  },
-  koike: {
-    id: 2,
-    name: "小池百合子",
-    checked: false,
-  },
-  josh: {
-    id: 3,
-    name: "ジョシュ・ホーキンソン",
-    checked: false,
-  },
-};
-
 interface TripAddFormProps {
-  userid?: string;
+  userid: { find_id: string } | null;
+  registers: {
+    id: number;
+    user_id: string;
+    fellow_id: string;
+    fellow: {
+      name: string;
+      id: string;
+    };
+  }[];
 }
+
+type Member = {
+  [key: string]: {
+    id: number;
+    name: string;
+    checked: boolean;
+  };
+};
 
 export type TripAddForm = z.infer<typeof TripAddSchema>;
 
-const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
-  const [fileName, setFileName] = useState("");
-  const [preview, setPreview] = useState("");
-  const [member, setMember] = useState(members);
+const TripAddForm: React.FC<TripAddFormProps> = ({ registers, userid }) => {
+  const [member, setMember] = useState<Member>({});
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   const [isMemberModalOpen, setIsMemberModalOpen] = useState<boolean>(false);
@@ -79,7 +76,7 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
       DepartureDate: new Date(),
       ArrivalDate: new Date(),
       Member: "",
-      TopPhoto: null,
+      thumbnail: null,
     },
   });
 
@@ -101,25 +98,12 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
     setMember(updatedMember);
   };
 
-  const handleCheckboxChange = (
-    memberKey: string,
-    isChecked: string | boolean
-  ) => {
+  const handleCheckboxChange = (memberName: string, isChecked: boolean) => {
     if (isChecked) {
-      setSelectedMembers((prev) => [...prev, member[memberKey].name]);
+      setSelectedMembers((prev) => [...prev, memberName]);
     } else {
-      setSelectedMembers((prev) =>
-        prev.filter((name) => name !== member[memberKey].name)
-      );
+      setSelectedMembers((prev) => prev.filter((name) => name !== memberName));
     }
-
-    setMember((prevMember) => ({
-      ...prevMember,
-      [memberKey]: {
-        ...prevMember[memberKey],
-        checked: isChecked,
-      },
-    }));
   };
 
   const openMemberModal = () => {
@@ -409,24 +393,21 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
               />
               <FormField
                 control={TripAddform.control}
-                name="TopPhoto"
+                name="thumbnail"
                 render={({ field: { onChange, value, ...rest } }) => (
-                  <FormItem>
-                    <FormLabel>ファイルアップロード</FormLabel>
-                    <FormControl>
+                  <FormItem className="flex items-center w-full pr-16 space-y-0  relative">
+                    <FormLabel className="text-lg md:text-xl w-1/3  sm:w-1/4  text-center">
+                      トップ写真:
+                    </FormLabel>
+                    <FormControl className="flex-1">
                       <div>
                         <Input
                           type="file"
                           {...rest}
                           onChange={(e) => {
                             const file = e.target.files[0];
-                            if (file) {
-                              setFileName(file.name);
-                              onChange(file);
-                            }
                           }}
                         />
-                        {fileName && <p>現在のファイル: {fileName}</p>}
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -462,21 +443,21 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ userid }) => {
             </div>
             <div className="py-10 sm:px-20 lg:px-36 flex flex-col   space-y-6">
               <div className="flex flex-col space-y-6">
-                {Object.entries(member).map(([key, value]) => (
-                  <div className="flex" key={key}>
+                {registers.map((register, index) => (
+                  <div className="flex" key={index}>
                     <Checkbox
-                      id={value.id.toString()}
+                      id={register.fellow_id.toString()}
                       className="self-start"
-                      checked={value.checked}
-                      onCheckedChange={(checked: string | boolean) =>
-                        handleCheckboxChange(key, checked as boolean)
+                      checked={selectedMembers.includes(register.fellow.name)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleCheckboxChange(register.fellow.name, checked)
                       }
                     />
                     <label
-                      htmlFor={value.id.toString()}
+                      htmlFor={register.id.toString()}
                       className="flex-1 text-xl text-center font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                      {value.name}
+                      {register.fellow.name}
                     </label>
                   </div>
                 ))}

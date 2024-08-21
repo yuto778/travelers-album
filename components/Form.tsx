@@ -175,7 +175,7 @@ const Form = () => {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="＊＊＊＊＊＊＊"
+                          placeholder="6文字以上"
                           {...field}
                         />
                       </FormControl>
@@ -241,7 +241,7 @@ const Form = () => {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="TripLove"
+                          placeholder="6文字以上"
                           {...field}
                           className="shadow-custom-shadow"
                         />
@@ -259,7 +259,7 @@ const Form = () => {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="TripLove"
+                          placeholder="6文字以上"
                           {...field}
                           className="shadow-custom-shadow "
                         />
