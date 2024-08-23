@@ -33,7 +33,7 @@ const page = async () => {
       <Toaster toastOptions={{ duration: 1000 }} />
       <div className="h-screen w-full flex flex-col layer-gradient">
         {/* /components/Header.tsx */}
-        <Header className="" />
+        <Header />
         <div className="flex-1  flex items-center justify-center ">
           {/* /components/Form.tsx */}
           <Form />

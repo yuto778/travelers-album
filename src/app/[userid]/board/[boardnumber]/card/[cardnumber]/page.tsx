@@ -43,7 +43,7 @@ const page = async ({
   return (
     <div className="flex flex-col h-screen w-screen layer-gradient">
       {/* /components/Header.tsx */}
-      <Header menu userid={Userid} />
+      <Header menu />
       <div className="flex overflow-hidden flex-1 flex-col">
         <div className="flex-1 flex flex-col ">
           <div className="h-12 flex items-center justify-center border-b-2 border-gray-200 ">

@@ -158,7 +158,7 @@ const Form = () => {
                   name="Email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Email</FormLabel>
+                      <FormLabel className="text-xl">メールアドレス</FormLabel>
                       <FormControl>
                         <Input placeholder="・・・@gmail.com" {...field} />
                       </FormControl>
@@ -171,7 +171,7 @@ const Form = () => {
                   name="Password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Password</FormLabel>
+                      <FormLabel className="text-xl">パスワード</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -203,7 +203,7 @@ const Form = () => {
                   name="UserName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">UserName</FormLabel>
+                      <FormLabel className="text-xl">名前</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="ゆうと"
@@ -220,7 +220,7 @@ const Form = () => {
                   name="Email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Email</FormLabel>
+                      <FormLabel className="text-xl">メールアドレス</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="・・・@gmail.com"
@@ -237,7 +237,7 @@ const Form = () => {
                   name="FirstPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Password</FormLabel>
+                      <FormLabel className="text-xl">パスワード</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -255,7 +255,7 @@ const Form = () => {
                   name="SecondPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Password</FormLabel>
+                      <FormLabel className="text-xl">パスワード2回目</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -273,7 +273,7 @@ const Form = () => {
                   name="birthday"
                   render={({ field }) => (
                     <FormItem className="items-center w-full relative">
-                      <FormLabel className="text-xl">BirthDay</FormLabel>
+                      <FormLabel className="text-xl">誕生日</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl className="w-full shadow-custom-shadow">

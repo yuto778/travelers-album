@@ -38,7 +38,7 @@ const page = async () => {
   }
   return (
     <div className="h-screen w-full flex flex-col layer-gradient">
-      <Header menu userid={UserId} />
+      <Header menu />
       <div className="flex-1  flex flex-col  items-center py-10 ">
         <div className="flex-1 flex flex-col  items-center justify-around w-1/2  py-32 px-10 bg-green-400 bg-opacity-25 shadow-custom-shadow rounded-xl ">
           <h2 className="text-3xl">メンバーを追加</h2>

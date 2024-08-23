@@ -34,7 +34,7 @@ interface MypageProps {
 }
 
 const UserIconUpdateformSchema = z.object({
-  icon: z.instanceof(File).optional(),
+  icon: z.instanceof(File),
 });
 
 const UserNameUpdateformSchema = z.object({
@@ -161,65 +161,93 @@ const Mypage: React.FC<MypageProps> = ({ user }) => {
       if (value.icon) {
         formData.append("icon", value.icon);
       }
-      const result = await IconUpdate(formData, session.user.id);
+      const updateIconpromise = IconUpdate(formData, session.user.id);
+
+      await toast.promise(updateIconpromise, {
+        loading: "少々お待ちください",
+        success: "写真の変更に成功しました",
+        error: "エラーが発生しました",
+      });
+
+      const result = await updateIconpromise;
       if (!result.success) {
         return null;
       }
-      toast.success("iconの更新に成功");
       UserIconUpdateform.reset();
       setIsUserIconUpdateModalOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error("iconの更新に失敗");
       console.error("iconの更新に失敗したよ", error);
     }
   };
 
   const UsernameUpdateSubmit = async (value: UserNameUpdateForm) => {
     try {
-      const result = await NameUpdate(value, user.id);
+      const updatePromise = NameUpdate(value, user.id);
+
+      await toast.promise(updatePromise, {
+        loading: "少々お待ちください",
+        success: "名前の変更に成功しました",
+        error: "エラーが発生しました",
+      });
+
+      const result = await updatePromise;
+
       if (!result.success) {
         return null;
       }
-      toast.success("名前の更新に成功");
+
       UserNameUpdateform.reset();
       setIsUserNameUpdateModalOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error("名前の更新に失敗");
       console.error("名前の更新に失敗したよ", error);
     }
   };
 
   const UserIdUpdateSubmit = async (value: UserIdUpdateForm) => {
     try {
-      const result = await IdUpdate(value, session.user.id);
+      const updateIdpromise = IdUpdate(value, session.user.id);
+
+      await toast.promise(updateIdpromise, {
+        loading: "少々お待ちください",
+        success: "ユーザーIDの変更に成功しました",
+        error: "エラーが発生しました",
+      });
+
+      const result = await updateIdpromise;
+
       if (!result.success) {
         return null;
       }
-      toast.success("useridの更新に成功");
       UserIdUpdateform.reset();
       setIsUseridUpdateModalOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error("useridの更新に失敗");
       console.error("useridの更新に失敗したよ", error);
     }
   };
 
   const UserEmailUpdateSubmit = async (value: UserEmailUpdateForm) => {
     try {
-      const result = await EmailUpdate(value, session.user.id);
+      const updateEmailpromise = EmailUpdate(value, session.user.id);
+
+      await toast.promise(updateEmailpromise, {
+        loading: "少々お待ちください",
+        success: "メールアドレスの変更に成功しました",
+        error: "エラーが発生しました",
+      });
+
+      const result = await updateEmailpromise;
+
       if (!result.success) {
         return null;
       }
 
-      toast.success("メールアドレスの更新に成功");
       UserEmailUpdateform.reset();
       setIsUserEmailUpdateModalOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error("メールアドレスの更新に失敗");
       console.error("メールアドレスの更新に失敗したよ", error);
     }
   };
@@ -227,15 +255,22 @@ const Mypage: React.FC<MypageProps> = ({ user }) => {
   const UserPasswordUpdateSubmit = async (value: UserPasswordUpdateForm) => {
     try {
       if (value.FirstPassword === value.SecondPassword) {
-        const result = await PasswordUpdate(
+        const updatePassword = PasswordUpdate(
           value.FirstPassword,
           session.user.id
         );
+
+        await toast.promise(updatePassword, {
+          loading: "少々お待ちください",
+          success: "パスワードの変更に成功しました",
+          error: "エラーが発生しました",
+        });
+
+        const result = await updatePassword;
         if (!result.success) {
           return null;
         }
 
-        toast.success("パスワードの更新に成功");
         UserPasswordUpdateform.reset();
         setIsUserPasswordUpdateModalOpen(false);
         router.refresh();
@@ -243,7 +278,6 @@ const Mypage: React.FC<MypageProps> = ({ user }) => {
         toast.error("パスワードが一致しません");
       }
     } catch (error) {
-      toast.error("パスワードの更新に失敗しました");
       console.error("パスワード更新中にエラーが発生しました:", error);
     }
   };
@@ -256,18 +290,18 @@ const Mypage: React.FC<MypageProps> = ({ user }) => {
           <h2 className="text-2xl font-bold">マイページ</h2>
           <div className="flex w-2/3  justify-around items-center ">
             <div
-              className="bg-gray-400 size-20 rounded-full relative overflow-hidden cursor-pointer"
+              className="bg-gray-400 size-20 rounded-full relative overflow-hidden cursor-pointer "
               onClick={() => setIsUserIconUpdateModalOpen(true)}
             >
               <Image
                 src={user.icon}
                 fill
-                className="object-cover"
+                className="object-cover "
                 alt="仮の写真です"
               />
             </div>
             <span
-              className="underline text-2xl cursor-pointer"
+              className="underline text-2xl cursor-pointer truncate  max-w-32"
               onClick={() => setIsUserNameUpdateModalOpen(true)}
             >
               {user.name}
@@ -276,7 +310,7 @@ const Mypage: React.FC<MypageProps> = ({ user }) => {
           <div className="space-y-2 w-2/3">
             <h2 className="text-xl">ユーザーID</h2>
             <h2
-              className="bg-white px-3 py-1 rounded-sm overflow-x-auto whitespace-nowrap cursor-pointer"
+              className="bg-white px-3 py-1 rounded-sm overflow-x-auto whitespace-nowrap cursor-pointer truncate"
               onClick={() => setIsUseridUpdateModalOpen(true)}
             >
               {user.find_id}
@@ -294,7 +328,7 @@ const Mypage: React.FC<MypageProps> = ({ user }) => {
           <div className="space-y-2 w-2/3">
             <h2 className="text-xl">パスワード</h2>
             <h2
-              className="bg-white px-3 py-1  rounded-sm overflow-x-auto whitespace-nowrap cursor-pointer"
+              className="bg-white px-3 py-1  rounded-sm overflow-x-auto whitespace-nowrap cursor-pointer truncate"
               onClick={() => setIsUserPasswordUpdateModalOpen(true)}
             >
               {"*".repeat(user.password.length)}
