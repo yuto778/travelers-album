@@ -19,23 +19,22 @@ interface ExifData {
 // 撮影日時を日本語表記に整形する関数
 function formatDatetime(dateValue: string | number | undefined): string {
   if (dateValue === undefined) {
-    return "日付情報なし";
+    return new Date().toISOString(); // 現在の日時をISO形式で返す
   }
 
-  console.log("Original date value:", dateValue); // デバッグ用ログ
+  let date: Date;
 
   if (typeof dateValue === "number") {
     // Unix timestamp (seconds or milliseconds)
-    const date = new Date(dateValue * (dateValue > 10000000000 ? 1 : 1000));
-    return formatDate(date);
+    date = new Date(dateValue * (dateValue > 10000000000 ? 1 : 1000));
   } else if (typeof dateValue === "string") {
     // EXIFの日付形式 "YYYY:MM:DD HH:mm:ss" を解析
     const [datePart, timePart] = dateValue.split(" ");
     const [year, month, day] = datePart.split(":");
     const [hour, minute, second] = timePart.split(":");
 
-    // UTCとして日付を解析し、日本時間に調整
-    const date = new Date(
+    // UTCとして日付を解析
+    date = new Date(
       Date.UTC(
         parseInt(year),
         parseInt(month) - 1,
@@ -45,13 +44,12 @@ function formatDatetime(dateValue: string | number | undefined): string {
         parseInt(second)
       )
     );
-    date.setUTCHours(date.getUTCHours() - 9); // UTCから日本時間への調整（9時間引く）
-    return formatDate(date);
   } else {
-    return "無効な日付形式";
+    return new Date().toISOString(); // 無効な入力の場合、現在の日時を返す
   }
-}
 
+  return date.toISOString(); // ISO-8601形式の文字列を返す
+}
 function formatDate(date: Date): string {
   if (isNaN(date.getTime())) {
     console.error("Invalid date:", date);
@@ -67,26 +65,27 @@ function formatDate(date: Date): string {
   )}秒`;
 }
 
-export const Cardadd = async (value: CardAddForm, boardnumber: string) => {
+export const Cardadd = async (
+  Title,
+  Memo,
+  formData: FormData,
+  boardnumber: string
+) => {
   console.log("開始するよ");
 
-  try {
-    const formData = new FormData();
-    if (value.photo) {
-      formData.append("photo", value.photo);
-    }
-    const file = formData.get("photo") as File;
+  const file = formData.get("photo") as File;
 
+  let latitude: string | null = null;
+  let longitude: string | null = null;
+  let dateTaken: string | null = null;
+
+  try {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const parser = exifParser.create(buffer);
     const result = parser.parse() as ExifData;
 
-    console.log("EXIF Data:", JSON.stringify(result, null, 2)); // 詳細なEXIFデータのログ
-
-    let latitude: string | null = null;
-    let longitude: string | null = null;
-    let dateTaken: string | null = null;
+    console.log("EXIF Data:", JSON.stringify(result, null, 2));
 
     // 位置情報の取得と文字列への変換（存在する場合）
     if (result.tags.GPSLatitude && result.tags.GPSLongitude) {
@@ -102,56 +101,37 @@ export const Cardadd = async (value: CardAddForm, boardnumber: string) => {
       console.log("DateTimeOriginal not found in EXIF data");
       dateTaken = "日付情報なし";
     }
+    console.log("Date Taken:", dateTaken);
+  } catch (exifError) {
+    console.error("EXIF parsing error:", exifError);
+    // EXIFデータの解析に失敗した場合のデフォルト値を設定
+    dateTaken = "日付情報なし";
+  }
 
+  try {
     const { url } = await put(boardnumber, file, { access: "public" });
 
-    try {
-      console.log("EXIF Data:", JSON.stringify(result, null, 2)); // 詳細なEXIFデータのログ
+    const createcard = await prisma.tripcards.create({
+      data: {
+        board_id: boardnumber,
+        title: Title,
+        memo: Memo,
+        thumbnail: url,
+      },
+    });
 
-      let latitude: string | null = null;
-      let longitude: string | null = null;
-      let dateTaken: string | null = null;
-
-      // 位置情報の取得と文字列への変換（存在する場合）
-      if (result.tags.GPSLatitude && result.tags.GPSLongitude) {
-        latitude = result.tags.GPSLatitude.toString();
-        longitude = result.tags.GPSLongitude.toString();
-        console.log("GPS Data:", { latitude, longitude });
-      }
-
-      // 撮影日時の取得と日本語表記への変換
-      if (result.tags.DateTimeOriginal !== undefined) {
-        dateTaken = formatDatetime(result.tags.DateTimeOriginal);
-      } else {
-        console.log("DateTimeOriginal not found in EXIF data");
-        dateTaken = "日付情報なし";
-      }
-
-      const createcard = await prisma.tripcards.create({
-        data: {
-          board_id: boardnumber,
-          title: value.Title,
-          memo: value.Memo,
-          thumbnail: url,
-        },
-      });
-
-      const createpicture = await prisma.cardpictures.create({
-        data: {
-          tripcard_id: createcard.id,
-          picture_url: url,
-          take_at: dateTaken,
-          location_pointx: latitude,
-          location_pointy: longitude,
-        },
-      });
-
-      return { success: true, createcard, createpicture };
-    } catch (error) {
-      console.error("Card addition error:", error);
-      return { success: false, error: "カードの追加中にエラーが発生しました" };
-    }
-  } finally {
-    await prisma.$disconnect();
+    const createpicture = await prisma.cardpictures.create({
+      data: {
+        tripcard_id: createcard.id,
+        picture_url: url,
+        take_at: dateTaken,
+        location_pointx: latitude,
+        location_pointy: longitude,
+      },
+    });
+    return { success: true, createcard, createpicture };
+  } catch (error) {
+    console.error("Card addition error:", error);
+    return { success: false, error: "カードの追加中にエラーが発生しました" };
   }
 };

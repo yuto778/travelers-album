@@ -10,6 +10,7 @@ import { authOptions } from "@/@/lib/auth";
 import { redirect } from "next/navigation";
 import Tripaddmember from "@/components/Tripaddmember";
 import { prisma } from "@/lib/client";
+import Image from "next/image";
 
 // メタデータの設定
 export const metadata: Metadata = {
@@ -64,6 +65,7 @@ const page = async ({
   });
 
   console.log(tripwithUser);
+  console.log(find_cards);
 
   return (
     <>
@@ -83,21 +85,26 @@ const page = async ({
             )}
             {find_cards.length > 0 && (
               <>
-                <div
-                  className="h-2/3 px-5 w-full rounded-3xl flex  gap-6 items-center overflow-x-scroll relative mx-5 
-          "
-                >
+                <div className="h-2/3 px-5  w-full rounded-3xl flex gap-6 items-center overflow-x-scroll relative mx-5">
                   {find_cards.map((card, index) => (
-                    <div
-                      key={card.id}
-                      className="bg-green-200
-                   p-16 rounded-2xl shadow-custom-shadow hover:scale-110 transition hover:shadow-none cursor-pointer relative"
-                    >
-                      <h3 className="whitespace-nowrap">カード{index + 1}</h3>
-                      <Link
-                        href={`/${userid}/board/${boardnumber}/card/${card.id}`}
-                        className="absolute inset-0"
-                      ></Link>
+                    <div key={card.id} className="flex flex-col items-center">
+                      <div className="bg-green-200 p-16 rounded-2xl shadow-custom-shadow hover:scale-110 transition hover:shadow-none cursor-pointer relative overflow-hidden mb-2">
+                        <h3 className="whitespace-nowrap truncate z-10 relative bg-white bg-opacity-70 p-1 rounded">
+                          {card.title}
+                        </h3>
+                        <div className="absolute inset-0">
+                          <Image
+                            src={card.thumbnail}
+                            alt={card.title}
+                            layout="fill"
+                            objectFit="cover"
+                          />
+                        </div>
+                        <Link
+                          href={`/${userid}/board/${boardnumber}/card/${card.id}`}
+                          className="absolute inset-0"
+                        ></Link>
+                      </div>
                     </div>
                   ))}
                 </div>

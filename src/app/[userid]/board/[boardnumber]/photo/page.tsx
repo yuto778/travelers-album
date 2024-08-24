@@ -6,6 +6,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/client";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "写真一覧",
+  icons: {
+    icon: "favicon.png",
+  },
+};
 
 const page = async ({
   params: { userid, boardnumber },

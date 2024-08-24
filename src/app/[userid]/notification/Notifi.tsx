@@ -76,7 +76,7 @@ const Notifi: React.FC<NotifiProps> = ({ Register_notifications }) => {
               key={index}
               className="w-full border-b-2 border-gray-500 flex items-center justify-around"
             >
-              <h2 className="text-xl cursor-pointer" onClick={opentripmodal}>
+              <h2 className="text-xl cursor-pointer">
                 {register_notification.user?.name}からリクエストが届いてます
               </h2>
               <div className="flex space-x-5">

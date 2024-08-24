@@ -32,13 +32,22 @@ const LoginSchema = z.object({
   Password: z.string().min(6),
 });
 
-const SignUpSchema = z.object({
-  UserName: z.string(),
-  Email: z.string().email(),
-  FirstPassword: z.string().min(6),
-  SecondPassword: z.string().min(6),
-  birthday: z.date(),
-});
+const SignUpSchema = z
+  .object({
+    UserName: z.string(),
+    Email: z.string().email(),
+    FirstPassword: z
+      .string()
+      .min(6, "パスワードは6文字以上である必要があります"),
+    SecondPassword: z
+      .string()
+      .min(6, "パスワードは6文字以上である必要があります"),
+    birthday: z.date(),
+  })
+  .refine((data) => data.FirstPassword === data.SecondPassword, {
+    message: "パスワードが一致しません",
+    path: ["SecondPassword"],
+  });
 
 export type LoginFormSchema = z.infer<typeof LoginSchema>;
 export type SignUpFormSchema = z.infer<typeof SignUpSchema>;

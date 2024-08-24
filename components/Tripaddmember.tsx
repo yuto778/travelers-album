@@ -96,10 +96,10 @@ const Tripaddmember: React.FC<Tripaddmemberform> = ({
         </div>
         <div className="flex-1 flex flex-col items-center justify-center bg-neutral-200 rounded-xl m-4 pt-3 relative">
           <h2 className="text-xl">メンバー</h2>
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-center space-x-3">
             {Tripboars_Users.map((user) => (
-              <div key={user.user.id}>
-                <h2 className="text-xl">{user.user.name}</h2>
+              <div key={user.user.id} className="flex ">
+                <h2 className="text-xl ">{user.user.name}</h2>
               </div>
             ))}
           </div>

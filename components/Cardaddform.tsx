@@ -22,6 +22,7 @@ import {
 import { useSession } from "next-auth/react";
 import React from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const CardAddSchema = z.object({
   Title: z.string(),
@@ -37,6 +38,7 @@ interface CarddaddProps {
 
 const Cardaddform: React.FC<CarddaddProps> = ({ boardnumber }) => {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const CardAddform = useForm<CardAddForm>({
     resolver: zodResolver(CardAddSchema),
@@ -53,7 +55,15 @@ const Cardaddform: React.FC<CarddaddProps> = ({ boardnumber }) => {
       toast.error("写真を選択してください");
       return;
     }
-    const cardaddpromise = Cardadd(value, boardnumber);
+
+    const { Title, Memo, photo } = value;
+
+    const formData = new FormData();
+    if (photo) {
+      formData.append("photo", photo);
+    }
+
+    const cardaddpromise = Cardadd(Title, Memo, formData, boardnumber);
 
     await toast.promise(cardaddpromise, {
       loading: "少々お待ちください",
@@ -65,6 +75,10 @@ const Cardaddform: React.FC<CarddaddProps> = ({ boardnumber }) => {
 
     if (!result.success) {
       toast.error("エラーが発生したようです");
+    } else {
+      CardAddform.reset();
+      router.refresh();
+      router.back();
     }
   };
 
