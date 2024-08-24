@@ -24,6 +24,9 @@ import {
 import { Calendar } from "./ui/calendar";
 import { Checkbox } from "./ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Tripboardsadd } from "@/action/Tripboardsadd";
+import { useSession } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
 
 const TripAddSchema = z.object({
   Title: z.string(),
@@ -35,15 +38,18 @@ const TripAddSchema = z.object({
 
 interface TripAddFormProps {
   userid: { find_id: string } | null;
-  registers: {
-    id: number;
-    user_id: string;
-    fellow_id: string;
+  registers: ({
     fellow: {
-      name: string;
       id: string;
+      name: string;
     };
-  }[];
+  } & {
+    id: string;
+    user_id: string;
+    fellow_id: string | null;
+    requestion: boolean | null;
+    requestion_at: Date;
+  })[];
 }
 
 type Member = {
@@ -68,6 +74,8 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ registers, userid }) => {
     new Date()
   );
 
+  const { data: session } = useSession();
+
   const router = useRouter();
   const TripAddform = useForm<TripAddForm>({
     resolver: zodResolver(TripAddSchema),
@@ -81,8 +89,38 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ registers, userid }) => {
   });
 
   const Tripaddonsubmit = async (value: TripAddForm) => {
+    const { Title, DepartureDate, ArrivalDate, Member, thumbnail } = value;
+
     try {
-    } catch (error) {}
+      const formData = new FormData();
+      formData.append("thumbnail", thumbnail);
+
+      const addpromise = Tripboardsadd(
+        Title,
+        DepartureDate,
+        ArrivalDate,
+        Member,
+        formData,
+        session.user.id
+      );
+
+      await toast.promise(addpromise, {
+        loading: "少々お待ちください",
+        success: "追加に成功しました",
+        error: "エラーが発生しました",
+      });
+
+      const result = await addpromise;
+
+      TripAddform.reset();
+      router.push(`/${session.user.id}/board`);
+
+      if (!result.success) {
+        toast.error(`${result.message}`);
+      }
+    } catch (error) {
+      toast.error("追加時にエラーが発生しました");
+    }
   };
 
   const updateCheckboxStates = () => {
@@ -123,6 +161,7 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ registers, userid }) => {
 
   return (
     <>
+      <Toaster />
       <div className="flex flex-col h-full items-center py-5  ">
         <HookForm {...TripAddform}>
           <div className="flex flex-col items-center w-full h-full justify-center md:w-3/4 bg-green-400 bg-opacity-25 rounded-2xl shadow-custom-shadow space-y-7">
@@ -403,10 +442,14 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ registers, userid }) => {
                       <div>
                         <Input
                           type="file"
-                          {...rest}
+                          accept="image/*"
                           onChange={(e) => {
-                            const file = e.target.files[0];
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              onChange(file);
+                            }
                           }}
+                          {...rest}
                         />
                       </div>
                     </FormControl>
@@ -443,6 +486,11 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ registers, userid }) => {
             </div>
             <div className="py-10 sm:px-20 lg:px-36 flex flex-col   space-y-6">
               <div className="flex flex-col space-y-6">
+                {registers.length === 0 && (
+                  <>
+                    <h2 className="text-xl  self-center">登録者がいません</h2>
+                  </>
+                )}
                 {registers.map((register, index) => (
                   <div className="flex" key={index}>
                     <Checkbox
@@ -470,17 +518,6 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ registers, userid }) => {
               onClick={handleAddMember}
             >
               一緒に出かける！
-            </Button>
-
-            <Button
-              variant="outline"
-              className="self-center shadow-custom-shadow hover:shadow-none bg-green-200 transition hover:bg-green-400 "
-              onClick={() => {
-                router.push(`/${userid}/memberadd`);
-              }}
-            >
-              <PlusCircleIcon className="pr-2" />
-              新規旅行者登録
             </Button>
           </div>
         </div>

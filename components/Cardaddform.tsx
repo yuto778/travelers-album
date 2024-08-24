@@ -1,7 +1,11 @@
 "use client";
 
+// /cardaddform.tsx
+
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+
+import { Cardadd } from "@/action/Cardadd";
 
 import { z } from "zod";
 
@@ -15,17 +19,27 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/ui/form";
+import { useSession } from "next-auth/react";
+import React from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const CardAddSchema = z.object({
   Title: z.string(),
-
   photo: z.instanceof(File).optional(),
   Memo: z.string(),
 });
 
 export type CardAddForm = z.infer<typeof CardAddSchema>;
 
-const Cardaddform = () => {
+interface CarddaddProps {
+  boardnumber: string;
+}
+
+const Cardaddform: React.FC<CarddaddProps> = ({ boardnumber }) => {
+  const { data: session } = useSession();
+  const router = useRouter();
+
   const CardAddform = useForm<CardAddForm>({
     resolver: zodResolver(CardAddSchema),
     defaultValues: {
@@ -36,10 +50,41 @@ const Cardaddform = () => {
   });
 
   //formの要件が正しい時に動作<Button></Button>
-  const CardaddonSubmit = async (value: CardAddForm) => {};
+  const CardaddonSubmit = async (value: CardAddForm) => {
+    if (!value.photo) {
+      toast.error("写真を選択してください");
+      return;
+    }
+
+    const { Title, Memo, photo } = value;
+
+    const formData = new FormData();
+    if (photo) {
+      formData.append("photo", photo);
+    }
+
+    const cardaddpromise = Cardadd(Title, Memo, formData, boardnumber);
+
+    await toast.promise(cardaddpromise, {
+      loading: "少々お待ちください",
+      success: "カードの作成に成功しました",
+      error: "エラーが発生しました",
+    });
+
+    const result = await cardaddpromise;
+
+    if (!result.success) {
+      toast.error("エラーが発生したようです");
+    } else {
+      CardAddform.reset();
+      router.refresh();
+      router.back();
+    }
+  };
 
   return (
     <>
+      <Toaster />
       <div className="bg-green-400 bg-opacity-25 w-1/2 rounded-xl shadow-custom-shadow flex flex-col items-center px-20 py-10 space-y-6">
         <h2 className="text-2xl font-bold ">カードの追加</h2>
         <Form {...CardAddform}>
@@ -51,13 +96,13 @@ const Cardaddform = () => {
               control={CardAddform.control}
               name="Title"
               render={({ field }) => (
-                <FormItem className="flex items-center border h-auto ">
-                  <FormLabel className=" w-1/4 text-xl">タイトル</FormLabel>
+                <FormItem className=" ">
+                  <FormLabel className=" w-1/4 text-xl ">タイトル</FormLabel>
                   <FormControl className="flex-1 ">
                     <Input
                       placeholder="熱海"
                       {...field}
-                      className=" shadow-custom-shadow "
+                      className=" shadow-custom-shadow"
                     />
                   </FormControl>
 
@@ -69,16 +114,21 @@ const Cardaddform = () => {
               control={CardAddform.control}
               name="photo"
               render={({ field: { onChange, value, ...rest } }) => (
-                <FormItem className="flex items-center border">
-                  <FormLabel className="w-1/4 text-xl">写真</FormLabel>
-                  <FormControl className="flex-1">
+                <FormItem className="">
+                  <FormLabel className="w-1/4 text-xl flex items-center">
+                    写真
+                  </FormLabel>
+                  <FormControl className="flex-1 ">
                     <Input
                       type="file"
                       {...rest}
                       onChange={(e) => {
                         const file = e.target.files[0];
+                        if (file) {
+                          onChange(file);
+                        }
                       }}
-                      className="shadow-custom-shadow cursor-pointer"
+                      className="shadow-custom-shadow cursor-pointer "
                     />
                   </FormControl>
 
@@ -90,7 +140,7 @@ const Cardaddform = () => {
               control={CardAddform.control}
               name="Memo"
               render={({ field }) => (
-                <FormItem className="flex items-center border">
+                <FormItem className="">
                   <FormLabel className="w-1/4  text-xl">メモ</FormLabel>
                   <FormControl className="flex-1">
                     <Input

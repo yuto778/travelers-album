@@ -4,29 +4,33 @@ import "../../../../../../styles/global.css";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/@/lib/auth";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
+import { Cardadd } from "@/action/Cardadd";
 
-const page = async () => {
+export const metadata: Metadata = {
+  title: "カードの追加",
+  icons: {
+    icon: "/favicon.png",
+  },
+};
+
+const page = async ({
+  params: { userid, boardnumber },
+}: {
+  params: { userid: string; boardnumber: string };
+}) => {
   console.log("cardaddでFetching session...");
-  let Userid;
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      console.log("cardaddでセッション情報確保ならず");
-      redirect("/login");
-    } else {
-      console.log("cardaddでセッションの情報を出してみます", session);
-      Userid = session.user.id;
-    }
-  } catch (error) {
-    console.error("Error fetching session:", error);
+  const session = await getServerSession(authOptions);
+  if (!session) {
     redirect("/login");
   }
+
   return (
     <>
       <div className="h-screen w-screen layer-gradient flex flex-col">
-        <Header menu userid={Userid} />
+        <Header menu />
         <div className="flex-1 flex items-center justify-center ">
-          <Cardaddform />
+          <Cardaddform boardnumber={boardnumber} />
         </div>
       </div>
     </>

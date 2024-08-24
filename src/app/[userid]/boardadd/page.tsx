@@ -22,7 +22,7 @@ const page = async ({ params: { userid } }: { params: { userid: string } }) => {
     redirect("/login");
   }
   const registers = await prisma.fellowtravelers.findMany({
-    where: { user_id: session.user.id },
+    where: { user_id: session.user.id, requestion: true },
     include: { fellow: { select: { name: true, id: true } } },
   });
 

@@ -24,21 +24,24 @@ model Users {
 }
 
 model Fellowtravelers {
-  id        Int     @id @default(autoincrement())
-  user_id   String
-  user      Users   @relation("UserToFellowtraveler", fields: [user_id], references: [id])
-  fellow_id String?
-  fellow    Users?  @relation("FellowToUser", fields: [fellow_id], references: [id])
+  id            String   @id @default(uuid())
+  user_id       String
+  user          Users    @relation("UserToFellowtraveler", fields: [user_id], references: [id])
+  fellow_id     String?
+  fellow        Users?   @relation("FellowToUser", fields: [fellow_id], references: [id])
+  requestion    Boolean?
+  requestion_at DateTime @default(now()) @db.Timestamp(6)
 }
 
 model Tripboards_Users {
-  id            Int        @id @default(autoincrement())
+  id            String     @id @default(uuid()) @db.VarChar(50)
   user_id       String
   user          Users      @relation("UsertoTripboards_Users", fields: [user_id], references: [id])
   tripboard_id  String
   tripboard     Tripboards @relation("TripBords", fields: [tripboard_id], references: [id])
   inviteuser_id String
-  reqestion     Boolean?
+  requestion    Boolean?
+  requestion_at DateTime   @default(now()) @db.Timestamp(6)
 }
 
 model Tripboards {
@@ -58,6 +61,7 @@ model Tripcards {
   id           String         @id @default(uuid())
   board_id     String
   TripBoard    Tripboards     @relation("Tripboards", fields: [board_id], references: [id])
+  title        String?
   memo         String?
   thumbnail    String?
   Cardpictures Cardpictures[] @relation("Cardpicture")
@@ -69,6 +73,6 @@ model Cardpictures {
   Tripcard        Tripcards @relation("Cardpicture", fields: [tripcard_id], references: [id])
   picture_url     String?
   take_at         DateTime? @db.Date
-  location_pointx Float
-  location_pointy Float
+  location_pointx String
+  location_pointy String
 }

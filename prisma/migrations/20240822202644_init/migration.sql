@@ -13,9 +13,11 @@ CREATE TABLE "Users" (
 
 -- CreateTable
 CREATE TABLE "Fellowtravelers" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "fellow_id" TEXT,
+    "requestion" BOOLEAN,
+    "requestion_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Fellowtravelers_pkey" PRIMARY KEY ("id")
 );
@@ -27,6 +29,7 @@ CREATE TABLE "Tripboards_Users" (
     "tripboard_id" TEXT NOT NULL,
     "inviteuser_id" TEXT NOT NULL,
     "reqestion" BOOLEAN,
+    "requestion_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Tripboards_Users_pkey" PRIMARY KEY ("id")
 );
@@ -49,7 +52,7 @@ CREATE TABLE "Tripcards" (
     "id" TEXT NOT NULL,
     "board_id" TEXT NOT NULL,
     "memo" TEXT,
-    "thumbnail" SERIAL NOT NULL,
+    "thumbnail" TEXT,
 
     CONSTRAINT "Tripcards_pkey" PRIMARY KEY ("id")
 );
@@ -83,6 +86,9 @@ ALTER TABLE "Tripboards_Users" ADD CONSTRAINT "Tripboards_Users_user_id_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "Tripboards_Users" ADD CONSTRAINT "Tripboards_Users_tripboard_id_fkey" FOREIGN KEY ("tripboard_id") REFERENCES "Tripboards"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Tripboards" ADD CONSTRAINT "Tripboards_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Tripcards" ADD CONSTRAINT "Tripcards_board_id_fkey" FOREIGN KEY ("board_id") REFERENCES "Tripboards"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

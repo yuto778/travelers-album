@@ -4,8 +4,25 @@ import { Circle, X } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "../../../../components/ui/button";
 import { useRouter } from "next/navigation";
+import { ApproveRegister } from "@/action/Approveregister";
+import { FellowTravelersDelete } from "@/action/fellow_travelerDelete";
+import toast, { Toaster } from "react-hot-toast";
 
-const Notifi = () => {
+interface NotifiProps {
+  Register_notifications: ({
+    user: {
+      name: string;
+    };
+  } & {
+    id: string;
+    user_id: string;
+    fellow_id: string | null;
+    requestion: boolean | null;
+    requestion_at: Date;
+  })[];
+}
+
+const Notifi: React.FC<NotifiProps> = ({ Register_notifications }) => {
   const [tripmodal, setTripmodal] = useState<Boolean>(false);
   const router = useRouter();
 
@@ -17,31 +34,74 @@ const Notifi = () => {
     setTripmodal(true);
   };
 
-  const handlesubmit = () => {};
+  const handleapprove = async (user_id, fellow_id) => {
+    try {
+      const result = await ApproveRegister(user_id, fellow_id);
 
-  const handleXsubmit = () => {};
+      if (!result.success) {
+        toast.error(`${result.message}`);
+      }
+
+      toast.success("登録に成功しました");
+      router.refresh();
+    } catch (error) {
+      toast.error("エラーが発生しました");
+    }
+  };
+
+  const handleDelete = async (registers_id) => {
+    try {
+      const result = await FellowTravelersDelete(registers_id);
+      if (!result.success) {
+        toast.error(`${result.message}`);
+      }
+      toast.success(`${result.message}`);
+      router.refresh();
+    } catch (error) {
+      toast.error("失敗したようです");
+    }
+  };
 
   return (
     <>
-      <div className="w-full border-b-2 border-gray-500 flex items-center justify-around">
-        <h2 className="text-xl cursor-pointer" onClick={opentripmodal}>
-          ゆうとから旅行に招待されました
-        </h2>
-        <div className="flex space-x-5">
-          <div
-            className="bg-slate-300 rounded-full p-2 cursor-pointer"
-            onClick={handlesubmit}
-          >
-            <Circle className="text-red-600" />
-          </div>
-          <div
-            className="bg-slate-300 rounded-full p-2 cursor-pointer"
-            onClick={handleXsubmit}
-          >
-            <X className="" />
-          </div>
-        </div>
-      </div>
+      <Toaster />
+      {(!Register_notifications || Register_notifications.length === 0) && (
+        <h2 className="text-center text-xl">通知はありません</h2>
+      )}
+
+      {Register_notifications && Register_notifications.length > 0 && (
+        <>
+          {Register_notifications.map((register_notification, index) => (
+            <div
+              key={index}
+              className="w-full border-b-2 border-gray-500 flex items-center justify-around"
+            >
+              <h2 className="text-xl cursor-pointer">
+                {register_notification.user?.name}からリクエストが届いてます
+              </h2>
+              <div className="flex space-x-5">
+                <div
+                  className="bg-slate-300 rounded-full p-2 cursor-pointer"
+                  onClick={() =>
+                    handleapprove(
+                      register_notification.user_id,
+                      register_notification.fellow_id
+                    )
+                  }
+                >
+                  <Circle className="text-red-600" />
+                </div>
+                <div
+                  className="bg-slate-300 rounded-full p-2 cursor-pointer"
+                  onClick={() => handleDelete(register_notification.id)}
+                >
+                  <X className="" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
       {tripmodal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center z-50"
