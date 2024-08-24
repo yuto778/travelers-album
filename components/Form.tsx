@@ -24,26 +24,38 @@ import { cn } from "../@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./ui/calendar";
 import { ja } from "date-fns/locale";
+import { SignUp } from "@/action/Signup";
+import { getSession, signIn } from "next-auth/react";
 
 const LoginSchema = z.object({
   Email: z.string().email(),
   Password: z.string().min(6),
 });
 
-const SignUpSchema = z.object({
-  UserName: z.string(),
-  Email: z.string().email(),
-  FirstPassword: z.string().min(6),
-  SecondPassword: z.string().min(6),
-  birthday: z.date(),
-});
+const SignUpSchema = z
+  .object({
+    UserName: z.string(),
+    Email: z.string().email(),
+    FirstPassword: z
+      .string()
+      .min(6, "パスワードは6文字以上である必要があります"),
+    SecondPassword: z
+      .string()
+      .min(6, "パスワードは6文字以上である必要があります"),
+    birthday: z.date(),
+  })
+  .refine((data) => data.FirstPassword === data.SecondPassword, {
+    message: "パスワードが一致しません",
+    path: ["SecondPassword"],
+  });
 
-type LoginFormSchema = z.infer<typeof LoginSchema>;
-type SignUpFormSchema = z.infer<typeof SignUpSchema>;
+export type LoginFormSchema = z.infer<typeof LoginSchema>;
+export type SignUpFormSchema = z.infer<typeof SignUpSchema>;
 
 type Variant = "LogIn" | "SignUp";
 
 const Form = () => {
+  const [error, setError] = useState<string | null>(null);
   const [variant, setVariant] = useState<Variant>("LogIn");
   const [BirthdayCalendarMonth, setbirthdayCalendarMonth] = useState<Date>(
     new Date()
@@ -89,21 +101,59 @@ const Form = () => {
     }
   };
 
-  const handleSignUp = () => {
-    SignUpform.reset();
-    toast.success("新規登録に成功");
-    setVariant("LogIn");
+  //サインアップの記入欄が定義したものに合っていた場合に実行される関数
+  const handleSignUp = async (value: SignUpFormSchema) => {
+    try {
+      //FirstpasswordとSeccondpasswordの検証
+      if (value.FirstPassword === value.SecondPassword) {
+        //同じであればSignUp()サーバーアクション
+        const result = await SignUp(value);
+        console.log(result);
+
+        if (!result.success) {
+          return null;
+        }
+
+        console.log(result.data);
+        toast.success("新規登録に成功");
+
+        SignUpform.reset();
+        setVariant("LogIn");
+      }
+    } catch (error) {
+      console.error(error, "新規登録エラー");
+    }
   };
 
-  const handleLogIn = () => {
-    toast.success("ログインに成功！");
-    Loginform.reset();
-    router.push("/");
+  //ログインの記入欄が定義したものに合っていた場合に実行される関数
+  const handleLogIn = async (value: LoginFormSchema) => {
+    try {
+      const result = await signIn("credentials", {
+        email: value.Email,
+        password: value.Password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("ログインに失敗しました");
+      } else {
+        // セッション情報を取得
+        toast.success("ログインに成功！！！");
+        const session = await getSession();
+        if (session?.user?.id) {
+          router.push(`/${session.user.id}/board`);
+        } else {
+          setError("ユーザーIDが取得できませんでした");
+        }
+      }
+    } catch (error) {
+      setError("エラーが発生しました");
+    }
   };
 
   return (
     <>
-      <div className="bg-yellow-400 bg-opacity-20 rounded-lg shadow-lg  w-full mx-14 md:w-1/2 py-4 px-12 space-y-3">
+      <div className="bg-green-400 bg-opacity-25 rounded-lg shadow-lg  w-full mx-14 md:w-1/2 py-4 px-12 space-y-3">
         {variant === "LogIn" && (
           <>
             <h2 className="text-center text-2xl font-bold">ログイン</h2>
@@ -117,7 +167,7 @@ const Form = () => {
                   name="Email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Email</FormLabel>
+                      <FormLabel className="text-xl">メールアドレス</FormLabel>
                       <FormControl>
                         <Input placeholder="・・・@gmail.com" {...field} />
                       </FormControl>
@@ -130,11 +180,11 @@ const Form = () => {
                   name="Password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Password</FormLabel>
+                      <FormLabel className="text-xl">パスワード</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="TripLove"
+                          placeholder="6文字以上"
                           {...field}
                         />
                       </FormControl>
@@ -162,7 +212,7 @@ const Form = () => {
                   name="UserName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">UserName</FormLabel>
+                      <FormLabel className="text-xl">名前</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="ゆうと"
@@ -179,7 +229,7 @@ const Form = () => {
                   name="Email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Email</FormLabel>
+                      <FormLabel className="text-xl">メールアドレス</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="・・・@gmail.com"
@@ -196,11 +246,11 @@ const Form = () => {
                   name="FirstPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Password</FormLabel>
+                      <FormLabel className="text-xl">パスワード</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="TripLove"
+                          placeholder="6文字以上"
                           {...field}
                           className="shadow-custom-shadow"
                         />
@@ -214,11 +264,11 @@ const Form = () => {
                   name="SecondPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl">Password</FormLabel>
+                      <FormLabel className="text-xl">パスワード2回目</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="TripLove"
+                          placeholder="6文字以上"
                           {...field}
                           className="shadow-custom-shadow "
                         />
@@ -232,7 +282,7 @@ const Form = () => {
                   name="birthday"
                   render={({ field }) => (
                     <FormItem className="items-center w-full relative">
-                      <FormLabel className="text-xl">BirthDay</FormLabel>
+                      <FormLabel className="text-xl">誕生日</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl className="w-full shadow-custom-shadow">
@@ -343,12 +393,12 @@ const Form = () => {
             </HookForm>
           </>
         )}
-        <h2
+        <p
           onClick={handlevariant}
           className="text-center cursor-pointer underline text-gray-700"
         >
           {variant === "LogIn" ? "新規登録へ" : "ログインへ"}
-        </h2>
+        </p>
       </div>
     </>
   );

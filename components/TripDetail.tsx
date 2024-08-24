@@ -5,14 +5,44 @@ import React, { useState } from "react";
 import Map, { LocationInfo } from "./Map";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface TripDetailProps {
-  id?: string;
+  cardnumber: string;
+  cardinfo: {
+    id: string;
+    board_id: string;
+    title: string | null;
+    memo: string | null;
+    thumbnail: string | null;
+  };
+  pictureinfo: {
+    id: string;
+    tripcard_id: string;
+    picture_url: string | null;
+    take_at: Date | null;
+    location_pointx: string;
+    location_pointy: string;
+  }[];
+  boardinfo: {
+    id: string;
+    title: string;
+    thumbnail: string;
+    owner_id: string;
+    start_at: Date;
+    end_at: Date | null;
+    lastupdate_at: Date;
+  };
 }
 
 type Variant = "None" | "Edit";
 
-const TripDetail: React.FC<TripDetailProps> = ({ id }) => {
+const TripDetail: React.FC<TripDetailProps> = ({
+  cardnumber,
+  cardinfo,
+  pictureinfo,
+  boardinfo,
+}) => {
   const [variant, setVariant] = useState<Variant>("None");
   const [selectedLocation, setSelectedLocation] = useState<LocationInfo | null>(
     null
@@ -60,22 +90,30 @@ const TripDetail: React.FC<TripDetailProps> = ({ id }) => {
     setIsCardDeleteModal(false);
   };
 
-  const handleCardDelete = () => {
-    window.location.reload();
+  const handleCardDelete = async (cardid) => {
+    try {
+    } catch (error) {}
   };
   return (
-    <div className="flex-1 pt-10 px-8 md:px-14 lg:px-28 flex flex-col justify-center bg-gradient-to-b from-green-300 to-green-200 relative">
-      <div className="bg-white rounded-3xl flex h-4/5 w-full mb-5 shadow-custom-shadow p-6 relative">
+    <div className="flex-1 pt-10 px-8 md:px-14 lg:px-28 flex flex-col justify-center  relative">
+      <div className="bg-green-400 bg-opacity-25 rounded-3xl flex h-4/5 w-full mb-5 shadow-custom-shadow p-6 relative ">
         <div className="w-1/2 flex flex-col pr-5">
           <h2 className="font-bold text-2xl text-gray-700 bg-yellow-200 rounded-lg px-8 py-4 shadow-custom-shadow ">
-            {id} の旅名
+            {cardinfo.title}
           </h2>
           <div className="flex-1 w-full grid grid-cols-3 md:grid-cols-4 gap-2 p-8">
-            {[...Array(3)].map((_, index) => (
+            {pictureinfo.map((picture, index) => (
               <div
                 key={index}
-                className="bg-blue-600 rounded-lg aspect-square  shadow-custom-shadow hover:scale-105 transition cursor-pointer hover:shadow-none"
-              ></div>
+                className="bg-blue-600 relative overflow-hidden rounded-lg aspect-square  shadow-custom-shadow hover:scale-105 transition cursor-pointer hover:shadow-none"
+              >
+                <Image
+                  src={`${picture.picture_url}`}
+                  alt={`${picture.take_at}`}
+                  className="object-cover"
+                  fill
+                />
+              </div>
             ))}
           </div>
           <div className="h-1/6 flex items-center space-x-6 justify-center">
@@ -105,11 +143,15 @@ const TripDetail: React.FC<TripDetailProps> = ({ id }) => {
         </div>
         <div className="flex-1 flex flex-col p-3 pb-2">
           <h2 className="text-gray-600 text-xs md:text-sm lg:text-lg self-start md:self-center mb-3">
-            2024年7月10日
+            {boardinfo?.start_at.toLocaleDateString()} ~{" "}
+            {boardinfo?.end_at.toLocaleDateString()}
           </h2>
           <div className="h-2/3 w-full bg-red-300 rounded-2xl shadow-custom-shadow mb-4 flex flex-col relative overflow-hidden overflow-x-scroll">
             <div className="w-full h-full">
-              {/* <Map onLocationSelect={handleLocationSelect} /> */}
+              <Map
+                onLocationSelect={handleLocationSelect}
+                pictureinfos={pictureinfo}
+              />
             </div>
             {selectedLocation && (
               <div className="absolute bottom-0 w-full h-1/3 bg-gray-300 bg-opacity-85 px-5 overflow-auto">
@@ -128,6 +170,8 @@ const TripDetail: React.FC<TripDetailProps> = ({ id }) => {
               id=""
               className=" w-full h-full py-1 px-4 text-sm md:text-xl  placeholder:underline outline-green-300"
               placeholder="旅のメモを書いてね"
+              value={`${cardinfo.memo}`}
+              disabled={variant === "None"}
             ></textarea>
           </div>
         </div>
@@ -162,7 +206,7 @@ const TripDetail: React.FC<TripDetailProps> = ({ id }) => {
             variant={"outline"}
             className="top-5 right-5 absolute text-xl shadow-custom-shadow hover:scale-110 transition hover:shadow-none"
           >
-            <PlusCircle /> 旅行を追加
+            <PlusCircle /> カードを追加
           </Button>
         </div>
       )}
@@ -265,13 +309,13 @@ const TripDetail: React.FC<TripDetailProps> = ({ id }) => {
               <X />
             </div>
             <div className="py-10 md:px-10 lg:px-16 self-center">
-              <p>本当に「{id}」を削除しますか</p>
+              <p>本当に「{cardinfo.title}」を削除しますか</p>
             </div>
             <span className="flex-1"></span>
             <Button
               variant="destructive"
               className="self-center py-5 px-7 shadow-custom-shadow hover:shadow-none"
-              onClick={handleCardDelete}
+              onClick={() => handleCardDelete(cardinfo.id)}
             >
               削除
             </Button>

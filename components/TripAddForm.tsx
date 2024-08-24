@@ -3,12 +3,16 @@
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
-import { id, ja } from "date-fns/locale";
+import { ja } from "date-fns/locale";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, PlusCircle, PlusCircleIcon, X } from "lucide-react";
+import { format } from "date-fns";
+import { CalendarIcon, PlusCircleIcon, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { cn } from "../@/lib/utils";
 import {
   FormControl,
   FormField,
@@ -17,44 +21,49 @@ import {
   FormMessage,
   Form as HookForm,
 } from "../components/ui/form";
-import { useRouter } from "next/navigation";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { cn } from "../@/lib/utils";
-import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
-import { useState } from "react";
 import { Checkbox } from "./ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Tripboardsadd } from "@/action/Tripboardsadd";
+import { useSession } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
 
 const TripAddSchema = z.object({
   Title: z.string(),
   DepartureDate: z.date(),
   ArrivalDate: z.date(),
   Member: z.string(),
-  TopPhoto: z.string(),
+  thumbnail: z.instanceof(File).optional(),
 });
 
-const members = {
-  hachi: {
-    id: 1,
-    name: "八村塁",
-    checked: false,
-  },
-  koike: {
-    id: 2,
-    name: "小池百合子",
-    checked: false,
-  },
-  josh: {
-    id: 3,
-    name: "ジョシュ・ホーキンソン",
-    checked: false,
-  },
+interface TripAddFormProps {
+  userid: { find_id: string } | null;
+  registers: ({
+    fellow: {
+      id: string;
+      name: string;
+    };
+  } & {
+    id: string;
+    user_id: string;
+    fellow_id: string | null;
+    requestion: boolean | null;
+    requestion_at: Date;
+  })[];
+}
+
+type Member = {
+  [key: string]: {
+    id: number;
+    name: string;
+    checked: boolean;
+  };
 };
 
-type TripAddForm = z.infer<typeof TripAddSchema>;
+export type TripAddForm = z.infer<typeof TripAddSchema>;
 
-const TripAddForm = () => {
-  const [member, setMember] = useState(members);
+const TripAddForm: React.FC<TripAddFormProps> = ({ registers, userid }) => {
+  const [member, setMember] = useState<Member>({});
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   const [isMemberModalOpen, setIsMemberModalOpen] = useState<boolean>(false);
@@ -65,6 +74,8 @@ const TripAddForm = () => {
     new Date()
   );
 
+  const { data: session } = useSession();
+
   const router = useRouter();
   const TripAddform = useForm<TripAddForm>({
     resolver: zodResolver(TripAddSchema),
@@ -73,12 +84,43 @@ const TripAddForm = () => {
       DepartureDate: new Date(),
       ArrivalDate: new Date(),
       Member: "",
-      TopPhoto: "",
+      thumbnail: null,
     },
   });
 
-  const Tripadd = () => {
-    router.replace("/tripadd");
+  const Tripaddonsubmit = async (value: TripAddForm) => {
+    const { Title, DepartureDate, ArrivalDate, Member, thumbnail } = value;
+
+    try {
+      const formData = new FormData();
+      formData.append("thumbnail", thumbnail);
+
+      const addpromise = Tripboardsadd(
+        Title,
+        DepartureDate,
+        ArrivalDate,
+        Member,
+        formData,
+        session.user.id
+      );
+
+      await toast.promise(addpromise, {
+        loading: "少々お待ちください",
+        success: "追加に成功しました",
+        error: "エラーが発生しました",
+      });
+
+      const result = await addpromise;
+
+      TripAddform.reset();
+      router.push(`/${session.user.id}/board`);
+
+      if (!result.success) {
+        toast.error(`${result.message}`);
+      }
+    } catch (error) {
+      toast.error("追加時にエラーが発生しました");
+    }
   };
 
   const updateCheckboxStates = () => {
@@ -94,25 +136,12 @@ const TripAddForm = () => {
     setMember(updatedMember);
   };
 
-  const handleCheckboxChange = (
-    memberKey: string,
-    isChecked: string | boolean
-  ) => {
+  const handleCheckboxChange = (memberName: string, isChecked: boolean) => {
     if (isChecked) {
-      setSelectedMembers((prev) => [...prev, member[memberKey].name]);
+      setSelectedMembers((prev) => [...prev, memberName]);
     } else {
-      setSelectedMembers((prev) =>
-        prev.filter((name) => name !== member[memberKey].name)
-      );
+      setSelectedMembers((prev) => prev.filter((name) => name !== memberName));
     }
-
-    setMember((prevMember) => ({
-      ...prevMember,
-      [memberKey]: {
-        ...prevMember[memberKey],
-        checked: isChecked,
-      },
-    }));
   };
 
   const openMemberModal = () => {
@@ -132,15 +161,16 @@ const TripAddForm = () => {
 
   return (
     <>
-      <div className="flex flex-col h-full items-center py-5 bg-gradient-to-b from-green-300 to-green-200">
-        <h2 className="text-2xl font-semibold self-start pl-10 md:pl-32">
-          Add Trip Log
-        </h2>
+      <Toaster />
+      <div className="flex flex-col h-full items-center py-5  ">
         <HookForm {...TripAddform}>
-          <div className="flex items-center w-full h-full justify-center md:w-3/4">
+          <div className="flex flex-col items-center w-full h-full justify-center md:w-3/4 bg-green-400 bg-opacity-25 rounded-2xl shadow-custom-shadow space-y-7">
+            <h2 className=" text-2xl font-semibold self-center  ">
+              旅行ボードを追加
+            </h2>
             <form
-              onSubmit={TripAddform.handleSubmit(Tripadd)}
-              className="space-y-10 flex flex-col w-full  "
+              onSubmit={TripAddform.handleSubmit(Tripaddonsubmit)}
+              className="space-y-8 flex flex-col w-full  "
             >
               <FormField
                 control={TripAddform.control}
@@ -166,7 +196,7 @@ const TripAddForm = () => {
                 name="DepartureDate"
                 render={({ field }) => (
                   <FormItem className="flex items-center w-full pr-16 space-y-0 relative">
-                    <FormLabel className="text-lg md:text-xl  w-1/3  sm:w-1/4 text-center">
+                    <FormLabel className="text-lg md:text-xl w-1/3  sm:w-1/4 text-center">
                       出発日 :
                     </FormLabel>
                     <Popover>
@@ -219,8 +249,8 @@ const TripAddForm = () => {
                                       }}
                                     >
                                       {Array.from(
-                                        { length: 201 },
-                                        (_, i) => i + 1900
+                                        { length: 101 },
+                                        (_, i) => i + 1990
                                       ).map((year) => (
                                         <option key={year} value={year}>
                                           {year}年
@@ -267,9 +297,6 @@ const TripAddForm = () => {
                       </PopoverContent>
                     </Popover>
                     <FormMessage />
-                    <div className="absolute right-3 p-2 bg-slate-300 rounded-full  cursor-pointer hover:scale-110 transition shadow-custom-shadow hover:shadow-none">
-                      <CalendarIcon className="" />
-                    </div>
                   </FormItem>
                 )}
               />
@@ -379,9 +406,6 @@ const TripAddForm = () => {
                       </PopoverContent>
                     </Popover>
                     <FormMessage />
-                    <div className="absolute right-3 p-2 bg-slate-300 rounded-full  cursor-pointer hover:scale-110 transition shadow-custom-shadow hover:shadow-none">
-                      <CalendarIcon className="" />
-                    </div>
                   </FormItem>
                 )}
               />
@@ -398,40 +422,38 @@ const TripAddForm = () => {
                       <Input
                         placeholder="ゆうと"
                         {...field}
-                        className="shadow-custom-shadow"
+                        className="shadow-custom-shadow cursor-pointer"
                         autoComplete="off"
+                        onClick={openMemberModal}
                       />
                     </FormControl>
-
-                    <div
-                      className=" absolute right-3 p-2 bg-slate-300 rounded-full  cursor-pointer hover:scale-110 transition shadow-custom-shadow hover:shadow-none "
-                      onClick={openMemberModal}
-                    >
-                      <PlusCircle className="" />
-                    </div>
                   </FormItem>
                 )}
               />
               <FormField
                 control={TripAddform.control}
-                name="TopPhoto"
-                render={({ field }) => (
-                  <FormItem className="flex items-center w-full pr-16 space-y-0 relative">
-                    <FormLabel className="text-lg md:text-xl w-1/3  sm:w-1/4 text-center">
-                      トップ写真 :
+                name="thumbnail"
+                render={({ field: { onChange, value, ...rest } }) => (
+                  <FormItem className="flex items-center w-full pr-16 space-y-0  relative">
+                    <FormLabel className="text-lg md:text-xl w-1/3  sm:w-1/4  text-center">
+                      トップ写真:
                     </FormLabel>
                     <FormControl className="flex-1">
-                      <Input
-                        type="file"
-                        placeholder="PhotoPath"
-                        {...field}
-                        className=" shadow-custom-shadow hover:bg-gray-100  transition cursor-pointer"
-                      />
+                      <div>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              onChange(file);
+                            }
+                          }}
+                          {...rest}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
-                    <div className="absolute right-3 p-2 bg-slate-300 rounded-full  cursor-pointer hover:scale-110 transition shadow-custom-shadow hover:shadow-none ">
-                      <PlusCircle className="" />
-                    </div>
                   </FormItem>
                 )}
               />
@@ -464,21 +486,26 @@ const TripAddForm = () => {
             </div>
             <div className="py-10 sm:px-20 lg:px-36 flex flex-col   space-y-6">
               <div className="flex flex-col space-y-6">
-                {Object.entries(member).map(([key, value]) => (
-                  <div className="flex" key={key}>
+                {registers.length === 0 && (
+                  <>
+                    <h2 className="text-xl  self-center">登録者がいません</h2>
+                  </>
+                )}
+                {registers.map((register, index) => (
+                  <div className="flex" key={index}>
                     <Checkbox
-                      id={value.id.toString()}
+                      id={register.fellow_id.toString()}
                       className="self-start"
-                      checked={value.checked}
-                      onCheckedChange={(checked: string | boolean) =>
-                        handleCheckboxChange(key, checked as boolean)
+                      checked={selectedMembers.includes(register.fellow.name)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleCheckboxChange(register.fellow.name, checked)
                       }
                     />
                     <label
-                      htmlFor={value.id.toString()}
+                      htmlFor={register.id.toString()}
                       className="flex-1 text-xl text-center font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                      {value.name}
+                      {register.fellow.name}
                     </label>
                   </div>
                 ))}
@@ -491,17 +518,6 @@ const TripAddForm = () => {
               onClick={handleAddMember}
             >
               一緒に出かける！
-            </Button>
-
-            <Button
-              variant="outline"
-              className="self-center shadow-custom-shadow hover:shadow-none bg-green-200 transition hover:bg-green-400 "
-              onClick={() => {
-                router.push("/tripadd/addmember");
-              }}
-            >
-              <PlusCircleIcon className="pr-2" />
-              新規旅行者登録
             </Button>
           </div>
         </div>

@@ -1,8 +1,16 @@
+// /app/login/page.tsx
+
 import { Metadata } from "next";
+import { useSession } from "next-auth/react";
+import { Toaster } from "react-hot-toast";
 import Form from "../../../components/Form";
 import Header from "../../../components/Header";
-import { Toaster } from "react-hot-toast";
+import "../../../styles/global.css";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/@/lib/auth";
 
+// メタデータの設定
 export const metadata: Metadata = {
   title: "ログインページ",
   description: "ログインと新規登録を行うページになります",
@@ -11,13 +19,23 @@ export const metadata: Metadata = {
   },
 };
 
-const page = () => {
+const page = async () => {
+  console.log("loginでsession取得");
+  const session = await getServerSession(authOptions);
+
+  if (session) {
+    redirect(`/${session.user.id}/board`);
+  }
+
   return (
     <>
+      {/* トースターの表示（1秒表示) */}
       <Toaster toastOptions={{ duration: 1000 }} />
-      <div className="h-screen w-full flex flex-col bg-gradient-to-b from-white to-black">
-        <Header className="bg-neutral-300" />
-        <div className="flex-1  flex items-center justify-center bg-gradient-to-b from-green-300 to-green-200">
+      <div className="h-screen w-full flex flex-col layer-gradient">
+        {/* /components/Header.tsx */}
+        <Header />
+        <div className="flex-1  flex items-center justify-center ">
+          {/* /components/Form.tsx */}
           <Form />
         </div>
       </div>

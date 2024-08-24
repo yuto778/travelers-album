@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "next-auth":["./node_modules/next-auth"]
+    },
     "lib": [
       "dom",
       "dom.iterable",
@@ -21,6 +26,7 @@
         "name": "next"
       }
     ],
+  
     "target": "ES2017"
   },
   "include": [

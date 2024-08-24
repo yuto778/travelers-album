@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+// ユーザー情報を記録するテーブル
+model Users {
+  id               String             @id @default(uuid()) @db.VarChar(50)
+  find_id          String             @unique @default(uuid()) @db.VarChar(50)
+  name             String             @db.VarChar(50)
+  email            String             @unique
+  password         String
+  birthday         DateTime           @db.Date
+  icon             String?
+  Fellowtravelers  Fellowtravelers[]  @relation("UserToFellowtraveler")
+  FellowOf         Fellowtravelers[]  @relation("FellowToUser")
+  Tripboards_Users Tripboards_Users[] @relation("UsertoTripboards_Users")
+  Owner_id         Tripboards[]
+}
+
+model Fellowtravelers {
+  id            String   @id @default(uuid())
+  user_id       String
+  user          Users    @relation("UserToFellowtraveler", fields: [user_id], references: [id])
+  fellow_id     String?
+  fellow        Users?   @relation("FellowToUser", fields: [fellow_id], references: [id])
+  requestion    Boolean?
+  requestion_at DateTime @default(now()) @db.Timestamp(6)
+}
+
+model Tripboards_Users {
+  id            String     @id @default(uuid()) @db.VarChar(50)
+  user_id       String
+  user          Users      @relation("UsertoTripboards_Users", fields: [user_id], references: [id])
+  tripboard_id  String
+  tripboard     Tripboards @relation("TripBords", fields: [tripboard_id], references: [id])
+  inviteuser_id String
+  requestion    Boolean?
+  requestion_at DateTime   @default(now()) @db.Timestamp(6)
+}
+
+model Tripboards {
+  id              String             @id @default(uuid()) @db.VarChar(50)
+  title           String             @db.VarChar(50)
+  thumbnail       String
+  owner_id        String
+  owner           Users              @relation(fields: [owner_id], references: [id])
+  start_at        DateTime           @db.Date
+  end_at          DateTime?          @db.Date
+  lastupdate_at   DateTime           @default(now()) @db.Timestamp(6)
+  Tripcards       Tripcards[]        @relation("Tripboards")
+  Tripboars_Users Tripboards_Users[] @relation("TripBords")
+}
+
+model Tripcards {
+  id           String         @id @default(uuid())
+  board_id     String
+  TripBoard    Tripboards     @relation("Tripboards", fields: [board_id], references: [id])
+  title        String?
+  memo         String?
+  thumbnail    String?
+  Cardpictures Cardpictures[] @relation("Cardpicture")
+}
+
+model Cardpictures {
+  id              String    @id @default(uuid()) @db.VarChar(50)
+  tripcard_id     String
+  Tripcard        Tripcards @relation("Cardpicture", fields: [tripcard_id], references: [id])
+  picture_url     String?
+  take_at         DateTime? @db.Date
+  location_pointx String
+  location_pointy String
+}
