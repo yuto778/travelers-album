@@ -32,6 +32,8 @@ export default async function Home({
     redirect("/login");
   }
 
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+
   const boards = await prisma.tripboards.findMany({
     where: { owner_id: session.user.id },
   });
@@ -67,7 +69,7 @@ export default async function Home({
                         <Image
                           src={`${board.thumbnail}`}
                           alt="写真です"
-                          className="object-fill"
+                          className="object-cover"
                           fill
                         />
                       </div>

@@ -21,6 +21,8 @@ export const metadata: Metadata = {
   },
 };
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 // params:{id}でurlの[id]を取得
 const page = async ({
   params: { userid, boardnumber },
@@ -34,11 +36,6 @@ const page = async ({
   if (!session) {
     redirect("/login");
   }
-
-  const triptitle = await prisma.tripboards.findUnique({
-    where: { id: boardnumber },
-    select: { title: true },
-  });
 
   const tripwithUser = await prisma.tripboards_Users.findMany({
     where: { tripboard_id: boardnumber },
@@ -64,6 +61,13 @@ const page = async ({
     },
   });
 
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const triptitle = await prisma.tripboards.findUnique({
+    where: { id: boardnumber },
+    select: { title: true },
+  });
+
   console.log(tripwithUser);
   console.log(find_cards);
 
@@ -74,7 +78,7 @@ const page = async ({
         <Header menu />
         <div className="flex-1 w-full flex flex-col overflow-hidden">
           <div className="h-16 w-full flex items-center justify-center border-b-2 border-gray-400  ">
-            <h2 className="text-xl font-bold">{triptitle.title}</h2>
+            <h2 className="text-xl font-bold">{triptitle?.title}</h2>
           </div>
           <div className="h-1/2  flex flex-col  rounded-3xl   relative shadow-custom-shadow ">
             <h2 className="self-center text-2xl font-bold pt-5 ">Cards</h2>
@@ -89,7 +93,7 @@ const page = async ({
                   {find_cards.map((card, index) => (
                     <div key={card.id} className="flex flex-col items-center">
                       <div className="bg-green-200 p-16 rounded-2xl shadow-custom-shadow hover:scale-110 transition hover:shadow-none cursor-pointer relative overflow-hidden mb-2">
-                        <h3 className="whitespace-nowrap truncate z-10 relative bg-white bg-opacity-70 p-1 rounded">
+                        <h3 className="whitespace-nowrap truncate z-20 relative bg-white bg-opacity-70 p-1 rounded">
                           {card.title}
                         </h3>
                         <div className="absolute inset-0">
@@ -98,6 +102,7 @@ const page = async ({
                             alt={card.title}
                             layout="fill"
                             objectFit="cover"
+                            className="z-10"
                           />
                         </div>
                         <Link

@@ -76,9 +76,12 @@ const Cardaddform: React.FC<CarddaddProps> = ({ boardnumber }) => {
     if (!result.success) {
       toast.error("エラーが発生したようです");
     } else {
-      CardAddform.reset();
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+      toast.success("画面遷移します");
       router.refresh();
-      router.back();
+
+      router.push(`/${session.user.id}/board/${boardnumber}`);
+      CardAddform.reset();
     }
   };
 

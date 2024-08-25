@@ -66,7 +66,7 @@ const Hamburger: React.FC<HamburgerProps> = ({ className }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black bg-opacity-85 flex justify-end z-10"
+            className="fixed inset-0 bg-black bg-opacity-85 flex justify-end z-40"
             onClick={deleteHamburgerDeleteModal}
           >
             <motion.div

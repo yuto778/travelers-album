@@ -112,6 +112,9 @@ const TripAddForm: React.FC<TripAddFormProps> = ({ registers, userid }) => {
 
       const result = await addpromise;
 
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      toast.success("画面遷移します");
+
       TripAddform.reset();
       router.push(`/${session.user.id}/board`);
 
