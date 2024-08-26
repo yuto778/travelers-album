@@ -107,7 +107,7 @@ const page = async ({
                         </div>
                         <Link
                           href={`/${userid}/board/${boardnumber}/card/${card.id}`}
-                          className="absolute inset-0"
+                          className="absolute inset-0 z-10"
                         ></Link>
                       </div>
                     </div>
